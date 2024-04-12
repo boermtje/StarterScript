@@ -54,9 +54,11 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     String[] wispTypes = Arrays.stream(Divination.WispType.values())
                             .map(Enum::name)
                             .toArray(String[]::new);
-                    NativeInteger selectedWisp = new NativeInteger(divinationSkill.getwispState().ordinal());
+                    NativeInteger selectedWisp = new NativeInteger(divinationSkill.getCurrentWispType().ordinal());
                     if (ImGui.Combo("Wisp Type", selectedWisp, wispTypes)) {
-                        divinationSkill.setWispType(Divination.WispType.values()[selectedWisp.get()]);
+                        Divination.WispType newWispType = Divination.WispType.values()[selectedWisp.get()];
+                        divinationSkill.setWispType(newWispType);
+                        script.saveConfiguration(); // Save the new selection
                     }
                     if (ImGui.Button("Start Divination")) {
                         script.setBotState(SkeletonScript.BotState.DIVINATIONSKILLING);

@@ -33,6 +33,7 @@ public class SkeletonScript extends LoopingScript {
     public SkeletonScript(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition) {
         super(s, scriptConfig, scriptDefinition);
         this.sgc = new SkeletonScriptGraphicsContext(getConsole(), this);
+        loadConfiguration(); // Load configuration when the script starts
     }
 
     @Override
@@ -54,6 +55,34 @@ public class SkeletonScript extends LoopingScript {
             }
             }
         }
+
+    ////////////////Save & Load Config/////////////////////
+    void loadConfiguration() {
+        try {
+            String selectedWispTypeName = configuration.getProperty("selectedWispType");
+            if (selectedWispTypeName != null && !selectedWispTypeName.isEmpty()) {
+                // Convert the saved name back to a WispType enum
+                Divination.WispType selectedWispType = Divination.WispType.valueOf(selectedWispTypeName);
+                divinationSkill.setWispType(selectedWispType);
+                println("WispType configuration loaded successfully: " + selectedWispType.name());
+            }
+        } catch (Exception e) {
+            println("Error loading configuration: \n" + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+            println("This is a non-fatal error, you can ignore it.");
+        }
+    }
+
+    void saveConfiguration() {
+        try {
+            // Save the selected WispType using its name
+            configuration.addProperty("selectedWispType", divinationSkill.getCurrentWispType().name());
+            configuration.save();
+            println("WispType configuration saved successfully.");
+        } catch (Exception e) {
+            println("Error saving configuration: \n" + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+            println("This is a non-fatal error, you can ignore it.");
+        }
+    }
 
     ////////////////////Botstate/////////////////////
     public BotState getBotState() {

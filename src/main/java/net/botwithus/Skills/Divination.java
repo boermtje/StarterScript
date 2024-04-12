@@ -24,14 +24,31 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 public class Divination extends SkeletonScript {
-    public WispType wispState = WispType.PALE;
+    public WispType wispState = WispType.Pale;
     private boolean someBool = true;
     private Random random = new Random();
     public HashMap<String, Area> Colonies;
+    public WispType getCurrentWispType() {
+        return wispState;
+    }
+    public void setCurrentWispType(WispType wispType) {
+        this.wispState = wispType;
+    }
 
     public enum WispType {
-        PALE, FLICKERING, BRIGHT, GLOWING, SPARKLING, GLEAMING, VIBRANT,
-        LUSTROUS, ELDER, BRILLIANT, RADIANT, LUMINOUS, INCANDESCENT
+        Pale,
+        Flickering,
+        Bright,
+        Glowing,
+        Sparkling,
+        Gleaming,
+        Vibrant,
+        Lustrous,
+        Elder,
+        Brilliant,
+        Radiant,
+        Luminous,
+        Incandescent
     }
     public Divination(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition) {
         super(s, scriptConfig, scriptDefinition);
