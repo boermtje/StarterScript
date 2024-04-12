@@ -1,13 +1,12 @@
 package net.botwithus.Skills;
 
 import net.botwithus.SkeletonScript;
+import net.botwithus.SkeletonScript.BotState;
 import net.botwithus.internal.scripts.ScriptDefinition;
 import net.botwithus.rs3.script.config.ScriptConfig;
 import net.botwithus.api.game.hud.inventories.Backpack;
-import net.botwithus.internal.scripts.ScriptDefinition;
 import net.botwithus.rs3.events.impl.ChatMessageEvent;
 import net.botwithus.rs3.game.Client;
-import net.botwithus.rs3.game.minimenu.MiniMenu;
 import net.botwithus.rs3.game.movement.Movement;
 import net.botwithus.rs3.game.movement.NavPath;
 import net.botwithus.rs3.game.movement.TraverseEvent;
@@ -17,10 +16,6 @@ import net.botwithus.rs3.game.scene.entities.characters.npc.Npc;
 import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
 import net.botwithus.rs3.game.scene.entities.object.SceneObject;
 import net.botwithus.rs3.script.Execution;
-import net.botwithus.rs3.script.LoopingScript;
-import net.botwithus.rs3.script.config.ScriptConfig;
-import net.botwithus.rs3.events.impl.SkillUpdateEvent;
-import net.botwithus.rs3.game.skills.Skills;
 import net.botwithus.rs3.game.*;
 import net.botwithus.rs3.util.Regex;
 
@@ -29,25 +24,14 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 public class Divination extends SkeletonScript {
-    private WispType wispState = WispType.Pale;
+    public WispType wispState = WispType.PALE;
     private boolean someBool = true;
     private Random random = new Random();
     public HashMap<String, Area> Colonies;
 
-    enum WispType {
-        Pale,
-        Flickering,
-        Bright,
-        Glowing,
-        Sparkling,
-        Gleaming,
-        Vibrant,
-        Lustrous,
-        Elder,
-        Brilliant,
-        Radiant,
-        Luminous,
-        Incandescent
+    public enum WispType {
+        PALE, FLICKERING, BRIGHT, GLOWING, SPARKLING, GLEAMING, VIBRANT,
+        LUSTROUS, ELDER, BRILLIANT, RADIANT, LUMINOUS, INCANDESCENT
     }
     public Divination(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition) {
         super(s, scriptConfig, scriptDefinition);
@@ -115,7 +99,7 @@ public class Divination extends SkeletonScript {
 
     public long moveToColony() {
         if (Movement.traverse(NavPath.resolve(Colonies.get(wispState.name()))) == TraverseEvent.State.FINISHED) {
-            botState = BotState.SKILLING;
+            botState = BotState.DIVINATIONSKILLING;
         } else {
             println("Failed to traverse to colony");
         }
@@ -151,9 +135,9 @@ public class Divination extends SkeletonScript {
 
         if (containsMemoryItems()) {
             println("Backpack is still full");
-            botState = BotState.DEPOSIT;
+            botState = BotState.DIVINATIONDEPOSIT;
         } else {
-            botState = BotState.SKILLING;
+            botState = BotState.DIVINATIONSKILLING;
             println("Backpack is empty");
         }
 
@@ -170,15 +154,15 @@ public class Divination extends SkeletonScript {
         return false;
     }
 
-    private long handleSkilling(LocalPlayer player, String WispType) {
+    public long handleSkilling(LocalPlayer player, String WispType) {
         Area area = Colonies.get(wispState.name());
         if (!isInArea(area, player)) {
             System.out.println("Change state to traverse");
-            botState = BotState.TRAVERSE;
+            botState = BotState.DIVINATIONTRAVERSE;
             return random.nextLong(500, 800);
         }
         if (Backpack.isFull()) {
-            botState = BotState.DEPOSIT;
+            botState = BotState.DIVINATIONDEPOSIT;
         }
         else if (player.getAnimationId() == -1) {
             println("Player is not harvesting");

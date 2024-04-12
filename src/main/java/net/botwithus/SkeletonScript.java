@@ -16,14 +16,17 @@ import java.util.regex.Pattern;
 import static net.botwithus.rs3.game.skills.Skills.DIVINATION;
 
 public class SkeletonScript extends LoopingScript {
-    private BotState botState = BotState.IDLE;
+    public BotState botState = BotState.IDLE;
     private Random random = new Random();
+    private Divination divinationSkill;
 
     /////////////////////////////////////Botstate//////////////////////////
-    enum BotState {
+    public enum BotState {
         //define your own states here
         IDLE,
-        DIVINATION
+        DIVINATIONSKILLING,
+        DIVINATIONDEPOSIT,
+        DIVINATIONTRAVERSE
         //...
     }
 
@@ -45,9 +48,9 @@ public class SkeletonScript extends LoopingScript {
                 println("We're idle!");
                 Execution.delay(random.nextLong(1000, 3000));
             }
-            case DIVINATION -> {
+            case DIVINATIONSKILLING -> {
                 //do questing stuff
-                Execution.delay(Divination.handleSkilling);
+                Execution.delay(divinationSkill.handleSkilling(player, divinationSkill.wispState.name()));
             }
             }
         }

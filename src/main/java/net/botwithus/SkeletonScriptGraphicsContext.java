@@ -12,6 +12,7 @@ import java.util.Arrays;
 public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     private SkeletonScript script;
     private NativeInteger selectedItem;
+    private Divination divinationSkill;
 
     public SkeletonScriptGraphicsContext(ScriptConsole scriptConsole, SkeletonScript script) {
         super(scriptConsole);
@@ -48,17 +49,17 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     ImGui.EndTabItem();
                 }
                 if (ImGui.BeginTabItem("Divination", ImGuiWindowFlag.None.getValue())) {
-                    ImGui.Text("Current Wisp Type: " + ((Divination)script).getwispState());
+                    ImGui.Text("Current Wisp Type: " + (divinationSkill.getwispState()));
 
                     String[] wispTypes = Arrays.stream(Divination.WispType.values())
                             .map(Enum::name)
                             .toArray(String[]::new);
-                    NativeInteger selectedWisp = new NativeInteger(((Divination)script).getwispState().ordinal());
+                    NativeInteger selectedWisp = new NativeInteger(divinationSkill.getwispState().ordinal());
                     if (ImGui.Combo("Wisp Type", selectedWisp, wispTypes)) {
-                        ((Divination)script).setWispType(Divination.WispType.values()[selectedWisp.get()]);
+                        divinationSkill.setWispType(Divination.WispType.values()[selectedWisp.get()]);
                     }
                     if (ImGui.Button("Start Divination")) {
-                        script.setBotState(SkeletonScript.BotState.DIVINATION);
+                        script.setBotState(SkeletonScript.BotState.DIVINATIONSKILLING);
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("Stop Divination")) {
