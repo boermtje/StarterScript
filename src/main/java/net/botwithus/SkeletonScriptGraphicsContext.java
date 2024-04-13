@@ -13,6 +13,7 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     private SkeletonScript script;
     private NativeInteger selectedItem;
     private Divination divinationSkill;
+    public boolean progressiveModeEnabled = false;
 
     public SkeletonScriptGraphicsContext(ScriptConsole scriptConsole, SkeletonScript script) {
         super(scriptConsole);
@@ -51,6 +52,18 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                 if (ImGui.BeginTabItem("Divination", ImGuiWindowFlag.None.getValue())) {
                     ImGui.Text("Current Wisp Type: " + (divinationSkill.getwispState()));
 
+                    if (ImGui.Checkbox("Enable Progressive Mode", progressiveModeEnabled)) {
+                        progressiveModeEnabled = !progressiveModeEnabled;
+                        // If progressive mode just got enabled, automatically set the highest available wisp type
+                        if (progressiveModeEnabled) {
+                            int currentLevel = divinationSkill.currentDivinationLevel;
+                            Divination.WispType highestAvailableWisp = divinationSkill.getHighestAvailableWisp(currentLevel);
+                            divinationSkill.setWispType(highestAvailableWisp);
+                        }
+                        script.saveConfiguration(); // Save the new selection
+                    }
+
+                    if (!progressiveModeEnabled) {
                     String[] wispTypes = Arrays.stream(Divination.WispType.values())
                             .map(Enum::name)
                             .toArray(String[]::new);
@@ -66,6 +79,7 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     ImGui.SameLine();
                     if (ImGui.Button("Stop Divination")) {
                         script.setBotState(SkeletonScript.BotState.IDLE);
+                        }
                     }
                     ImGui.EndTabItem();
                 }

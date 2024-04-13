@@ -18,6 +18,7 @@ import static net.botwithus.rs3.game.skills.Skills.DIVINATION;
 public class SkeletonScript extends LoopingScript {
     public BotState botState = BotState.IDLE;
     private Random random = new Random();
+    private SkeletonScriptGraphicsContext GraphicsContext;
     private Divination divinationSkill;
 
     /////////////////////////////////////Botstate//////////////////////////
@@ -66,6 +67,14 @@ public class SkeletonScript extends LoopingScript {
                 divinationSkill.setWispType(selectedWispType);
                 println("WispType configuration loaded successfully: " + selectedWispType.name());
             }
+
+            // Load and set the state of progressive mode
+            String progressiveModeEnabledString = configuration.getProperty("progressiveModeEnabled");
+            if (progressiveModeEnabledString != null && !progressiveModeEnabledString.isEmpty()) {
+                GraphicsContext.progressiveModeEnabled = Boolean.parseBoolean(progressiveModeEnabledString);
+                println("Progressive mode configuration loaded successfully: " + progressiveModeEnabledString);
+            }
+
         } catch (Exception e) {
             println("Error loading configuration: \n" + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
             println("This is a non-fatal error, you can ignore it.");
@@ -76,6 +85,7 @@ public class SkeletonScript extends LoopingScript {
         try {
             // Save the selected WispType using its name
             configuration.addProperty("selectedWispType", divinationSkill.getCurrentWispType().name());
+            configuration.addProperty("progressiveModeEnabled", String.valueOf(GraphicsContext.progressiveModeEnabled));
             configuration.save();
             println("WispType configuration saved successfully.");
         } catch (Exception e) {

@@ -2,7 +2,10 @@ package net.botwithus.Skills;
 
 import net.botwithus.SkeletonScript;
 import net.botwithus.SkeletonScript.BotState;
+import net.botwithus.SkeletonScriptGraphicsContext;
 import net.botwithus.internal.scripts.ScriptDefinition;
+import net.botwithus.rs3.events.impl.SkillUpdateEvent;
+import net.botwithus.rs3.game.skills.Skills;
 import net.botwithus.rs3.script.config.ScriptConfig;
 import net.botwithus.api.game.hud.inventories.Backpack;
 import net.botwithus.rs3.events.impl.ChatMessageEvent;
@@ -20,13 +23,17 @@ import net.botwithus.rs3.game.*;
 import net.botwithus.rs3.util.Regex;
 
 import java.util.HashMap;
+import java.util.NavigableMap;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 public class Divination extends SkeletonScript {
     public WispType wispState = WispType.Pale;
     private boolean someBool = true;
     private Random random = new Random();
+    public int currentDivinationLevel;
+    private SkeletonScriptGraphicsContext GraphicsContext;
     public HashMap<String, Area> Colonies;
     public WispType getCurrentWispType() {
         return wispState;
@@ -34,6 +41,7 @@ public class Divination extends SkeletonScript {
     public void setCurrentWispType(WispType wispType) {
         this.wispState = wispType;
     }
+    private final NavigableMap<Integer, WispType> levelToWispMap = new TreeMap<>();
 
     public enum WispType {
         Pale,
@@ -48,11 +56,13 @@ public class Divination extends SkeletonScript {
         Brilliant,
         Radiant,
         Luminous,
-        Incandescent
+        Incandescent,
     }
     public Divination(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition) {
         super(s, scriptConfig, scriptDefinition);
         initializeMaps(); // Call to initialize maps
+        initializeLevels(); // Call to initialize levels
+        subscribeToSkillUpdates(); // Call to subscribe to skill updates
         subscribe(ChatMessageEvent.class, chatMessageEvent -> {
             if (chatMessageEvent.getMessage().contains("A chronicle escapes from the spring!")) {
                 println("Chronicle found!");
@@ -67,6 +77,38 @@ public class Divination extends SkeletonScript {
                 }
             }
         });
+    }
+
+    private void subscribeToSkillUpdates() {
+        // Subscribe to the SkillUpdateEvent for Divination skill
+        subscribe(SkillUpdateEvent.class, skillUpdateEvent -> {
+            if (skillUpdateEvent.getId() == Skills.DIVINATION.getId()) {
+                // Update the current Divination level
+                currentDivinationLevel = skillUpdateEvent.getActualLevel();
+                // If the progressive mode is enabled and the level has increased,
+                // update the wisp type based on the new level.
+                if (GraphicsContext.progressiveModeEnabled) {
+                    checkAndUpdateWisp(currentDivinationLevel);
+                }
+            }
+        });
+    }
+
+    private void initializeLevels (){
+        // Initialize the wisp level map
+        levelToWispMap.put(1, WispType.Pale);
+        levelToWispMap.put(10, WispType.Flickering);
+        levelToWispMap.put(20, WispType.Bright);
+        levelToWispMap.put(30, WispType.Glowing);
+        levelToWispMap.put(40, WispType.Sparkling);
+        levelToWispMap.put(50, WispType.Gleaming);
+        levelToWispMap.put(60, WispType.Vibrant);
+        levelToWispMap.put(70, WispType.Lustrous);
+        levelToWispMap.put(75, WispType.Elder);
+        levelToWispMap.put(80, WispType.Brilliant);
+        levelToWispMap.put(85, WispType.Radiant);
+        levelToWispMap.put(90, WispType.Luminous);
+        levelToWispMap.put(95, WispType.Incandescent);
     }
 
     private void initializeMaps() {
@@ -112,6 +154,14 @@ public class Divination extends SkeletonScript {
             Execution.delay(random.nextLong(3000, 7000));
             return;
         }
+    }
+
+    public WispType getHighestAvailableWisp(int currentLevel) {
+        return levelToWispMap.floorEntry(currentLevel).getValue();
+    }
+
+    public void checkAndUpdateWisp(int currentLevel) {
+        setCurrentWispType(getHighestAvailableWisp(currentLevel));
     }
 
     public long moveToColony() {
