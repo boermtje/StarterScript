@@ -1,6 +1,7 @@
 package net.botwithus;
 
 import net.botwithus.Skills.Divination;
+import net.botwithus.rs3.game.skills.Skills;
 import net.botwithus.rs3.imgui.ImGui;
 import net.botwithus.rs3.imgui.ImGuiWindowFlag;
 import net.botwithus.rs3.imgui.NativeInteger;
@@ -15,16 +16,30 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     private Divination divinationSkill;
     public boolean progressiveModeEnabled = false;
     private Map<String, SkeletonScript.BotState> botStateMap;
-    private Queue<BotQueueItem> botStateQueue = new LinkedList<>();
+    public Queue<BotQueueItem> botStateQueue = new LinkedList<>();
 
-    // Helper class to hold BotState and the level to achieve before switching
-    private class BotQueueItem {
-        SkeletonScript.BotState state;
-        int targetLevel;
-        public BotQueueItem(SkeletonScript.BotState state, int targetLevel) {
+    public static class BotQueueItem {
+        public SkeletonScript.BotState state;
+        public int targetLevel;
+        public Skills skill;
+
+        public BotQueueItem(SkeletonScript.BotState state, int targetLevel, Skills skill) {
             this.state = state;
             this.targetLevel = targetLevel;
+            this.skill = skill;
         }
+    }
+
+    private Skills mapStateToSkill(SkeletonScript.BotState state) {
+        // Your logic to map a BotState to a Skills enum value
+        // Example:
+        switch (state) {
+            case DIVINATION:
+                return Skills.DIVINATION;
+            case RUNECRAFTING:
+                return Skills.RUNECRAFTING;
+        }
+        return null;
     }
 
     public SkeletonScriptGraphicsContext(ScriptConsole scriptConsole, SkeletonScript script) {
@@ -33,42 +48,57 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         initializeBotStateMap();
     }
 
-    private void initializeBotStateMap() {
+
+    public void initializeBotStateMap() {
         botStateMap = new HashMap<>();
-        botStateMap.put("Idle State", SkeletonScript.BotState.IDLE);
+        // Initialize states with default values for demonstration
         botStateMap.put("RuneCrafting State", SkeletonScript.BotState.RUNECRAFTING);
-        botStateMap.put("Divination State", SkeletonScript.BotState.DIVINATIONSKILLING);
-        // Add more states as necessary
-        // Initialize with some default values
-        botStateQueue.add(new BotQueueItem(SkeletonScript.BotState.IDLE, 50));  // Example usage
+        botStateMap.put("Divination State", SkeletonScript.BotState.DIVINATION);
+
+        // Assuming each state has a default starting skill level target
+        botStateQueue.add(new BotQueueItem(SkeletonScript.BotState.DIVINATION, 50, Skills.DIVINATION));
+        botStateQueue.add(new BotQueueItem(SkeletonScript.BotState.RUNECRAFTING, 30, Skills.RUNECRAFTING));
     }
 
     @Override
-    public void drawSettings () {
+    public void drawSettings() {
         if (ImGui.Begin("Starter Script", ImGuiWindowFlag.None.getValue())) {
             if (ImGui.BeginTabBar("My bar", ImGuiWindowFlag.None.getValue())) {
                 if (ImGui.BeginTabItem("Main Settings + Queue", ImGuiWindowFlag.None.getValue())) {
                     ImGui.Text("Current script state: " + script.getBotState().name());
 
                     // Display the queue
-                    if (ImGui.BeginChild("QueueList", 0, 150, true, 0)) {  // Fixed here
-                        for (BotQueueItem item : new ArrayList<>(botStateQueue)) {
-                            if (ImGui.Selectable(item.state.name() + " until level " + item.targetLevel, false, 0)) {  // Fixed here
-                                botStateQueue.remove(item);
+                    // Specify a width and height for the child window
+                    if (ImGui.BeginChild("QueueList", 300.0f, 150.0f, true, 0)) {
+                        for (Iterator<BotQueueItem> iterator = botStateQueue.iterator(); iterator.hasNext();) {
+                            BotQueueItem item = iterator.next();
+                            ImGui.PushID(item.state.name()); // Ensure unique ID for controls
+                            ImGui.Text(item.state.name() + " until level: ");
+                            ImGui.SameLine();
+
+                            int newLevel = ImGui.InputInt("##level" + item.state.name(), item.targetLevel);
+                            if (newLevel != item.targetLevel) {
+                                item.targetLevel = newLevel;
                             }
+
+                            ImGui.SameLine();
+                            if (ImGui.Button("Remove##" + item.state)) {
+                                iterator.remove(); // Use iterator.remove() to avoid ConcurrentModificationException
+                            }
+                            ImGui.PopID();
                         }
                         ImGui.EndChild();
                     }
 
                     // Allow adding new states to the queue
                     String[] botStateNames = botStateMap.keySet().toArray(new String[0]);
-                    selectedItem = new NativeInteger(0);
+                    selectedItem = new NativeInteger(0); // Manage the selected index
                     if (ImGui.Combo("Add Bot State", selectedItem, botStateNames)) {
-                        int levelToReach = 0; // Assuming you set this somewhere
-                        botStateQueue.add(new BotQueueItem(botStateMap.get(botStateNames[selectedItem.get()]), levelToReach));
+                        Skills selectedSkill = mapStateToSkill(botStateMap.get(botStateNames[selectedItem.get()]));
+                        // Assuming you want to set a default target level for the new state, e.g., 0
+                        botStateQueue.add(new BotQueueItem(botStateMap.get(botStateNames[selectedItem.get()]), 0, selectedSkill));
                     }
 
-                    // Buttons to start or stop the script based on the queue
                     if (ImGui.Button("Start Queue")) {
                         // Logic to start processing the queue
                     }
@@ -93,21 +123,21 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     }
 
                     if (!progressiveModeEnabled) {
-                    String[] wispTypes = Arrays.stream(Divination.WispType.values())
-                            .map(Enum::name)
-                            .toArray(String[]::new);
-                    NativeInteger selectedWisp = new NativeInteger(divinationSkill.getCurrentWispType().ordinal());
-                    if (ImGui.Combo("Wisp Type", selectedWisp, wispTypes)) {
-                        Divination.WispType newWispType = Divination.WispType.values()[selectedWisp.get()];
-                        divinationSkill.setWispType(newWispType);
-                        script.saveConfiguration(); // Save the new selection
-                    }
-                    if (ImGui.Button("Start Divination")) {
-                        script.setBotState(SkeletonScript.BotState.DIVINATIONSKILLING);
-                    }
-                    ImGui.SameLine();
-                    if (ImGui.Button("Stop Divination")) {
-                        script.setBotState(SkeletonScript.BotState.IDLE);
+                        String[] wispTypes = Arrays.stream(Divination.WispType.values())
+                                .map(Enum::name)
+                                .toArray(String[]::new);
+                        NativeInteger selectedWisp = new NativeInteger(divinationSkill.getCurrentWispType().ordinal());
+                        if (ImGui.Combo("Wisp Type", selectedWisp, wispTypes)) {
+                            Divination.WispType newWispType = Divination.WispType.values()[selectedWisp.get()];
+                            divinationSkill.setWispType(newWispType);
+                            script.saveConfiguration(); // Save the new selection
+                        }
+                        if (ImGui.Button("Start Divination")) {
+                            script.setBotState(SkeletonScript.BotState.DIVINATION);
+                        }
+                        ImGui.SameLine();
+                        if (ImGui.Button("Stop Divination")) {
+                            script.setBotState(SkeletonScript.BotState.IDLE);
                         }
                     }
                     ImGui.EndTabItem();
@@ -131,6 +161,13 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         }
     }
 
+    public int getCurrentSkillLevel(Skills skill) {
+        return skill.getLevel();  // This should call the method that fetches the level for the specified skill
+    }
+
     @Override
-    public void drawOverlay() { super.drawOverlay(); }
+    public void drawOverlay() {
+        super.drawOverlay();
+    }
 }
+

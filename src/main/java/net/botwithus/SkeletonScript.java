@@ -8,6 +8,7 @@ import net.botwithus.internal.scripts.ScriptDefinition;
 import net.botwithus.rs3.game.Area;
 import net.botwithus.rs3.game.Client;
 import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
+import net.botwithus.rs3.game.skills.Skills;
 import net.botwithus.rs3.script.Execution;
 import net.botwithus.rs3.script.LoopingScript;
 import net.botwithus.rs3.script.config.ScriptConfig;
@@ -55,6 +56,23 @@ public class SkeletonScript extends LoopingScript {
         if (player == null || Client.getGameState() != Client.GameState.LOGGED_IN) {
             Execution.delay(random.nextLong(3000, 7000));
             return;
+        }
+
+
+        // Access the queue from the graphics context
+        Queue<SkeletonScriptGraphicsContext.BotQueueItem> queue = GraphicsContext.botStateQueue;
+        if (!queue.isEmpty()) {
+            SkeletonScriptGraphicsContext.BotQueueItem currentItem = queue.peek();
+            int currentLevel = getCurrentSkillLevel(currentItem.skill); // Assuming a method to fetch the level
+
+            if (currentLevel >= currentItem.targetLevel) {
+                queue.poll(); // Remove the completed task
+                if (!queue.isEmpty()) {
+                    setBotState(queue.peek().state); // Set the next state
+                } else {
+                    setBotState(SkeletonScript.BotState.IDLE); // Set to idle if queue is empty
+                }
+            }
         }
 
         switch (botState) {
@@ -111,6 +129,12 @@ public class SkeletonScript extends LoopingScript {
                 Execution.delay(runecraftingSkill.interactWithPriorityObjects(player));;
             }
         }
+    }
+
+    // Method to fetch the current skill level based on the Skill associated with a BotState
+    private int getCurrentSkillLevel(Skills skill) {
+        // Implementation depends on how skills are managed in your game client interface
+        return skill.getLevel();
     }
 
     ////////////////Save & Load Config/////////////////////
