@@ -1,7 +1,6 @@
 package net.botwithus.Skills;
 
 import net.botwithus.SkeletonScript;
-import net.botwithus.SkeletonScript.BotState;
 import net.botwithus.SkeletonScriptGraphicsContext;
 import net.botwithus.internal.scripts.ScriptDefinition;
 import net.botwithus.rs3.events.impl.SkillUpdateEvent;
@@ -152,7 +151,6 @@ public class Divination extends SkeletonScript {
         if (player == null || Client.getGameState() != Client.GameState.LOGGED_IN || botState == BotState.IDLE) {
             //wait some time so we dont immediately start on login.
             Execution.delay(random.nextLong(3000, 7000));
-            return;
         }
     }
 
@@ -173,7 +171,7 @@ public class Divination extends SkeletonScript {
         return random.nextLong(1000, 1500);
     }
 
-    private long deposit() {
+    public long deposit() {
         long startTime = System.currentTimeMillis();
         long maxDuration = 180000; // 3 minutes in milliseconds
 

@@ -10,10 +10,6 @@ import net.botwithus.rs3.script.config.ScriptConfig;
 
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-
-import static net.botwithus.rs3.game.skills.Skills.DIVINATION;
 
 public class SkeletonScript extends LoopingScript {
     public BotState botState = BotState.IDLE;
@@ -53,6 +49,14 @@ public class SkeletonScript extends LoopingScript {
             case DIVINATIONSKILLING -> {
                 //do questing stuff
                 Execution.delay(divinationSkill.handleSkilling(player, divinationSkill.wispState.name()));
+            }
+            case DIVINATIONDEPOSIT -> {
+                //do deposit stuff
+                Execution.delay(divinationSkill.deposit());
+            }
+            case DIVINATIONTRAVERSE -> {
+                //do traverse stuff
+                Execution.delay(divinationSkill.moveToColony());
             }
             }
         }
