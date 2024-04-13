@@ -28,7 +28,7 @@ public class SkeletonScript extends LoopingScript {
     public enum BotState {
         //define your own states here
         IDLE,
-        DIVINATIONSKILLING,
+        DIVINATION,
         DIVINATIONDEPOSIT,
         DIVINATIONTRAVERSE,
         CRAFTINGSKILLING,
@@ -62,7 +62,7 @@ public class SkeletonScript extends LoopingScript {
                 println("We're idle!");
                 Execution.delay(random.nextLong(1000, 3000));
             }
-            case DIVINATIONSKILLING -> {
+            case DIVINATION -> {
                 //do questing stuff
                 Execution.delay(divinationSkill.handleSkilling(player, divinationSkill.wispState.name()));
             }
