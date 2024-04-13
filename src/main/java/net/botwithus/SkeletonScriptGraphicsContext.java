@@ -1,10 +1,13 @@
 package net.botwithus;
 
 import net.botwithus.Skills.Divination;
+import net.botwithus.rs3.game.Client;
+import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
 import net.botwithus.rs3.game.skills.Skills;
 import net.botwithus.rs3.imgui.ImGui;
 import net.botwithus.rs3.imgui.ImGuiWindowFlag;
 import net.botwithus.rs3.imgui.NativeInteger;
+import net.botwithus.rs3.input.GameInput;
 import net.botwithus.rs3.script.ScriptConsole;
 import net.botwithus.rs3.script.ScriptGraphicsContext;
 
@@ -17,6 +20,9 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     public boolean progressiveModeEnabled = false;
     private Map<String, SkeletonScript.BotState> botStateMap;
     public Queue<BotQueueItem> botStateQueue = new LinkedList<>();
+    public void removeTask(SkeletonScript.BotState stateToRemove) {
+        botStateQueue.removeIf(item -> item.state == stateToRemove);
+    }
 
     public static class BotQueueItem {
         public SkeletonScript.BotState state;
@@ -88,6 +94,10 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                             ImGui.PopID();
                         }
                         ImGui.EndChild();
+                    }
+                    if (botStateQueue.isEmpty()) {
+                        script.setBotState(SkeletonScript.BotState.IDLE);
+                        //Lobby logic
                     }
 
                     // Allow adding new states to the queue

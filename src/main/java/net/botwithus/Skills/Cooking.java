@@ -1,6 +1,7 @@
 package net.botwithus.Skills;
 
 import net.botwithus.SkeletonScript;
+import net.botwithus.SkeletonScriptGraphicsContext;
 import net.botwithus.api.game.hud.inventories.Backpack;
 import net.botwithus.api.game.hud.inventories.Bank;
 import net.botwithus.internal.scripts.ScriptDefinition;
@@ -25,6 +26,7 @@ import net.botwithus.rs3.script.config.ScriptConfig;
 import java.util.Random;
 
 public class Cooking extends SkeletonScript {
+    SkeletonScriptGraphicsContext GraphicsContext;
     private Random random = new Random();
     Area.Rectangular area = new Area.Rectangular(new Coordinate(2792, 3455, 0), new Coordinate(2808, 3437, 0));
     public Cooking(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition) {
@@ -79,20 +81,25 @@ public class Cooking extends SkeletonScript {
             Bank.depositAll();
             Execution.delay(random.nextLong(1000, 2000));
             int cookingLevel = checkCookingLevel();
-            if (cookingLevel < 15) {
+            if (cookingLevel < 15 && Bank.contains("Raw crayfish")) {
                 // Crayfish
                 Bank.withdrawAll(13425);
-            } else if (cookingLevel < 25) {
+            } else if (cookingLevel < 25 && Bank.contains("Raw trout")) {
                 // Trout
-            } else if (cookingLevel < 52) {
+            } else if (cookingLevel < 52 && (Bank.contains("Raw salmon") || Bank.contains("Raw trout"))) {
                 // Salmon & Trout
                 Bank.withdrawAll(13425);
-                if (!Backpack.contains(13425));{
+                if (!Bank.contains("Raw Salmon"));{
                     Bank.withdrawAll(331);
                 }
-            } else if (cookingLevel < 80) {
+            } else if (cookingLevel < 80 && Bank.contains("Raw desert sole")) {
                 // Desert Soles
                 Bank.withdrawAll(40287);
+            }
+            else {
+                println("No food to cook");
+                Bank.close();
+                GraphicsContext.removeTask(BotState.COOKINGSKILLING);
             }
             Execution.delay(random.nextLong(1000, 2000));
             Bank.close();
