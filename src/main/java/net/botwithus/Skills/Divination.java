@@ -62,20 +62,6 @@ public class Divination extends SkeletonScript {
         initializeMaps(); // Call to initialize maps
         initializeLevels(); // Call to initialize levels
         subscribeToSkillUpdates(); // Call to subscribe to skill updates
-        subscribe(ChatMessageEvent.class, chatMessageEvent -> {
-            if (chatMessageEvent.getMessage().contains("A chronicle escapes from the spring!")) {
-                println("Chronicle found!");
-                Npc chronicle = NpcQuery.newQuery().id(18204).results().first();
-                println(chronicle);
-                if (chronicle != null) {
-                    Execution.delay(random.nextLong(300, 500));
-                    chronicle.interact("Capture");
-                }
-                else {
-                    println("Chronicle is null");
-                }
-            }
-        });
     }
 
     private void subscribeToSkillUpdates() {
@@ -152,6 +138,20 @@ public class Divination extends SkeletonScript {
             //wait some time so we dont immediately start on login.
             Execution.delay(random.nextLong(3000, 7000));
         }
+        subscribe(ChatMessageEvent.class, chatMessageEvent -> {
+            if (chatMessageEvent.getMessage().contains("A chronicle escapes from the spring!")) {
+                println("Chronicle found!");
+                Npc chronicle = NpcQuery.newQuery().id(18204).results().first();
+                println(chronicle);
+                if (chronicle != null) {
+                    Execution.delay(random.nextLong(300, 500));
+                    chronicle.interact("Capture");
+                }
+                else {
+                    println("Chronicle is null");
+                }
+            }
+        });
     }
 
     public WispType getHighestAvailableWisp(int currentLevel) {
@@ -164,7 +164,7 @@ public class Divination extends SkeletonScript {
 
     public long moveToColony() {
         if (Movement.traverse(NavPath.resolve(Colonies.get(wispState.name()))) == TraverseEvent.State.FINISHED) {
-            botState = BotState.DIVINATIONSKILLING;
+            botState = BotState.DIVINATION;
         } else {
             println("Failed to traverse to colony");
         }
@@ -202,7 +202,7 @@ public class Divination extends SkeletonScript {
             println("Backpack is still full");
             botState = BotState.DIVINATIONDEPOSIT;
         } else {
-            botState = BotState.DIVINATIONSKILLING;
+            botState = BotState.DIVINATION;
             println("Backpack is empty");
         }
 
