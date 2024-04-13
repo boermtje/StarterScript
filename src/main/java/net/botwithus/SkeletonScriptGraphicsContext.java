@@ -7,9 +7,7 @@ import net.botwithus.rs3.imgui.NativeInteger;
 import net.botwithus.rs3.script.ScriptConsole;
 import net.botwithus.rs3.script.ScriptGraphicsContext;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     private SkeletonScript script;
@@ -17,6 +15,17 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     private Divination divinationSkill;
     public boolean progressiveModeEnabled = false;
     private Map<String, SkeletonScript.BotState> botStateMap;
+    private Queue<BotQueueItem> botStateQueue = new LinkedList<>();
+
+    // Helper class to hold BotState and the level to achieve before switching
+    private class BotQueueItem {
+        SkeletonScript.BotState state;
+        int targetLevel;
+        public BotQueueItem(SkeletonScript.BotState state, int targetLevel) {
+            this.state = state;
+            this.targetLevel = targetLevel;
+        }
+    }
 
     public SkeletonScriptGraphicsContext(ScriptConsole scriptConsole, SkeletonScript script) {
         super(scriptConsole);
@@ -30,6 +39,8 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         botStateMap.put("RuneCrafting State", SkeletonScript.BotState.RUNECRAFTING);
         botStateMap.put("Divination State", SkeletonScript.BotState.DIVINATIONSKILLING);
         // Add more states as necessary
+        // Initialize with some default values
+        botStateQueue.add(new BotQueueItem(SkeletonScript.BotState.IDLE, 50));  // Example usage
     }
 
     @Override
@@ -37,25 +48,32 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         if (ImGui.Begin("Starter Script", ImGuiWindowFlag.None.getValue())) {
             if (ImGui.BeginTabBar("My bar", ImGuiWindowFlag.None.getValue())) {
                 if (ImGui.BeginTabItem("Main Settings + Queue", ImGuiWindowFlag.None.getValue())) {
-                    ImGui.Text("My scripts state is: " + script.getBotState());
+                    ImGui.Text("Current script state: " + script.getBotState().name());
 
-
-                    String[] botStateNames = Arrays.stream(SkeletonScript.BotState.values())
-                            .map(Enum::name)
-                            .toArray(String[]::new);
-
-                    // Use NativeInteger to manage the selected index
-                    if (ImGui.Combo("Bot State", selectedItem, botStateNames)) {
-                        script.setBotState(SkeletonScript.BotState.values()[selectedItem.get()]);
+                    // Display the queue
+                    if (ImGui.BeginChild("QueueList", 0, 150, true, 0)) {  // Fixed here
+                        for (BotQueueItem item : new ArrayList<>(botStateQueue)) {
+                            if (ImGui.Selectable(item.state.name() + " until level " + item.targetLevel, false, 0)) {  // Fixed here
+                                botStateQueue.remove(item);
+                            }
+                        }
+                        ImGui.EndChild();
                     }
 
-                    if (ImGui.Button("Start")) {
-                        script.setBotState(SkeletonScript.BotState.values()[selectedItem.get()]);
+                    // Allow adding new states to the queue
+                    String[] botStateNames = botStateMap.keySet().toArray(new String[0]);
+                    selectedItem = new NativeInteger(0);
+                    if (ImGui.Combo("Add Bot State", selectedItem, botStateNames)) {
+                        int levelToReach = 0; // Assuming you set this somewhere
+                        botStateQueue.add(new BotQueueItem(botStateMap.get(botStateNames[selectedItem.get()]), levelToReach));
                     }
 
+                    // Buttons to start or stop the script based on the queue
+                    if (ImGui.Button("Start Queue")) {
+                        // Logic to start processing the queue
+                    }
                     ImGui.SameLine();
                     if (ImGui.Button("Stop")) {
-                        //has been clicked
                         script.setBotState(SkeletonScript.BotState.IDLE);
                     }
                     ImGui.EndTabItem();
