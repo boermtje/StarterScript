@@ -1,7 +1,11 @@
 package net.botwithus;
 
+import net.botwithus.Skills.Crafting;
 import net.botwithus.Skills.Divination;
+import net.botwithus.Skills.Fishing;
+import net.botwithus.Skills.RuneCrafting;
 import net.botwithus.internal.scripts.ScriptDefinition;
+import net.botwithus.rs3.game.Area;
 import net.botwithus.rs3.game.Client;
 import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
 import net.botwithus.rs3.script.Execution;
@@ -16,6 +20,9 @@ public class SkeletonScript extends LoopingScript {
     private Random random = new Random();
     private SkeletonScriptGraphicsContext GraphicsContext;
     private Divination divinationSkill;
+    private Crafting craftingSkill;
+    private Fishing fishingSkill;
+    private RuneCrafting runecraftingSkill;
 
     /////////////////////////////////////Botstate//////////////////////////
     public enum BotState {
@@ -23,7 +30,16 @@ public class SkeletonScript extends LoopingScript {
         IDLE,
         DIVINATIONSKILLING,
         DIVINATIONDEPOSIT,
-        DIVINATIONTRAVERSE
+        DIVINATIONTRAVERSE,
+        CRAFTINGSKILLING,
+        CRAFTINGTRAVERSE,
+        CRAFTINGBANKING,
+        FISHINGSKILLING,
+        FISHINGBANKING,
+        FISHINGTRAVERSE,
+        FISHINGMENAPHOS,
+        FISHINGMENABANKING,
+        RUNECRAFTING
         //...
     }
 
@@ -58,8 +74,44 @@ public class SkeletonScript extends LoopingScript {
                 //do traverse stuff
                 Execution.delay(divinationSkill.moveToColony());
             }
+            case CRAFTINGSKILLING -> {
+                //do crafting stuff
+                Execution.delay(craftingSkill.handleSkilling(player));
+            }
+            case CRAFTINGTRAVERSE -> {
+                //do traverse stuff
+                Execution.delay(craftingSkill.Traverse());
+            }
+            case CRAFTINGBANKING -> {
+                //do banking stuff
+                Execution.delay(craftingSkill.Banking());
+            }
+            case FISHINGSKILLING -> {
+                //do fishing stuff
+                Execution.delay(fishingSkill.handleSkilling(player));
+            }
+            case FISHINGBANKING -> {
+                //do banking stuff
+                Execution.delay(fishingSkill.Banking());
+            }
+//            case FISHINGTRAVERSE -> {
+//                //do traverse stuff
+//                Execution.delay(fishingSkill.Menaphos(player));
+//            }
+            case FISHINGMENAPHOS -> {
+                //do traverse stuff
+                Execution.delay(fishingSkill.Menaphos(player));
+            }
+            case FISHINGMENABANKING -> {
+                //do banking stuff
+                Execution.delay(fishingSkill.MenaBanking());
+            }
+            case RUNECRAFTING -> {
+                //do runecrafting stuff
+                Execution.delay(runecraftingSkill.interactWithPriorityObjects(player));;
             }
         }
+    }
 
     ////////////////Save & Load Config/////////////////////
     void loadConfiguration() {

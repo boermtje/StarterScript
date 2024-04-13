@@ -8,24 +8,35 @@ import net.botwithus.rs3.script.ScriptConsole;
 import net.botwithus.rs3.script.ScriptGraphicsContext;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     private SkeletonScript script;
     private NativeInteger selectedItem;
     private Divination divinationSkill;
     public boolean progressiveModeEnabled = false;
+    private Map<String, SkeletonScript.BotState> botStateMap;
 
     public SkeletonScriptGraphicsContext(ScriptConsole scriptConsole, SkeletonScript script) {
         super(scriptConsole);
         this.script = script;
-        this.selectedItem = new NativeInteger(script.getBotState().ordinal()); // Initialize with the current state's ordinal
+        initializeBotStateMap();
+    }
+
+    private void initializeBotStateMap() {
+        botStateMap = new HashMap<>();
+        botStateMap.put("Idle State", SkeletonScript.BotState.IDLE);
+        botStateMap.put("RuneCrafting State", SkeletonScript.BotState.RUNECRAFTING);
+        botStateMap.put("Divination State", SkeletonScript.BotState.DIVINATIONSKILLING);
+        // Add more states as necessary
     }
 
     @Override
     public void drawSettings () {
         if (ImGui.Begin("Starter Script", ImGuiWindowFlag.None.getValue())) {
             if (ImGui.BeginTabBar("My bar", ImGuiWindowFlag.None.getValue())) {
-                if (ImGui.BeginTabItem("Main Settings", ImGuiWindowFlag.None.getValue())) {
+                if (ImGui.BeginTabItem("Main Settings + Queue", ImGuiWindowFlag.None.getValue())) {
                     ImGui.Text("My scripts state is: " + script.getBotState());
 
 
@@ -80,6 +91,19 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     if (ImGui.Button("Stop Divination")) {
                         script.setBotState(SkeletonScript.BotState.IDLE);
                         }
+                    }
+                    ImGui.EndTabItem();
+                }
+                if (ImGui.BeginTabItem("Runecrafting", ImGuiWindowFlag.None.getValue())) {
+                    ImGui.Text("My scripts state is: " + script.getBotState());
+                    if (ImGui.Button("Start")) {
+                        script.setBotState(SkeletonScript.BotState.RUNECRAFTING);
+                    }
+
+                    ImGui.SameLine();
+                    if (ImGui.Button("Stop")) {
+                        //has been clicked
+                        script.setBotState(SkeletonScript.BotState.IDLE);
                     }
                     ImGui.EndTabItem();
                 }
