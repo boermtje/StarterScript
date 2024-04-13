@@ -138,20 +138,6 @@ public class Divination extends SkeletonScript {
             //wait some time so we dont immediately start on login.
             Execution.delay(random.nextLong(3000, 7000));
         }
-        subscribe(ChatMessageEvent.class, chatMessageEvent -> {
-            if (chatMessageEvent.getMessage().contains("A chronicle escapes from the spring!")) {
-                println("Chronicle found!");
-                Npc chronicle = NpcQuery.newQuery().id(18204).results().first();
-                println(chronicle);
-                if (chronicle != null) {
-                    Execution.delay(random.nextLong(300, 500));
-                    chronicle.interact("Capture");
-                }
-                else {
-                    println("Chronicle is null");
-                }
-            }
-        });
     }
 
     public WispType getHighestAvailableWisp(int currentLevel) {
@@ -226,9 +212,18 @@ public class Divination extends SkeletonScript {
             botState = BotState.DIVINATIONTRAVERSE;
             return random.nextLong(500, 800);
         }
+
+        Npc chronicle = NpcQuery.newQuery().id(18204).results().first();
+        if (chronicle != null) {
+            println("Chronicle found!");
+            Execution.delay(random.nextLong(300, 500));
+            chronicle.interact("Capture");
+        }
+
         if (Backpack.isFull()) {
             botState = BotState.DIVINATIONDEPOSIT;
         }
+
         else if (player.getAnimationId() == -1) {
             println("Player is not harvesting");
             println("Harvesting " + WispType + " wisp");
@@ -244,11 +239,15 @@ public class Divination extends SkeletonScript {
                 return 1000;
             }
         }
+
         else {
             println("Player is already busy");
         }
+
         return random.nextLong(500, 1000);
     }
+
+
     public WispType getwispState() {
         return wispState;
     }
