@@ -1,9 +1,6 @@
 package net.botwithus;
 
-import net.botwithus.Skills.Crafting;
-import net.botwithus.Skills.Divination;
-import net.botwithus.Skills.Fishing;
-import net.botwithus.Skills.RuneCrafting;
+import net.botwithus.Skills.*;
 import net.botwithus.internal.scripts.ScriptDefinition;
 import net.botwithus.rs3.game.Area;
 import net.botwithus.rs3.game.Client;
@@ -24,6 +21,7 @@ public class SkeletonScript extends LoopingScript {
     private Crafting craftingSkill;
     private Fishing fishingSkill;
     private RuneCrafting runecraftingSkill;
+    private Cooking cookingSkill;
 
     /////////////////////////////////////Botstate//////////////////////////
     public enum BotState {
@@ -40,7 +38,10 @@ public class SkeletonScript extends LoopingScript {
         FISHINGTRAVERSE,
         FISHINGMENAPHOS,
         FISHINGMENABANKING,
-        RUNECRAFTING
+        RUNECRAFTING,
+        COOKINGSKILLING,
+        COOKINGTRAVERSE,
+        COOKINGBANKING
         //...
     }
 
@@ -127,6 +128,18 @@ public class SkeletonScript extends LoopingScript {
             case RUNECRAFTING -> {
                 //do runecrafting stuff
                 Execution.delay(runecraftingSkill.interactWithPriorityObjects(player));;
+            }
+            case COOKINGSKILLING -> {
+                //do cooking stuff
+                Execution.delay(cookingSkill.handleCooking(player));
+            }
+            case COOKINGTRAVERSE -> {
+                //do traverse stuff
+                Execution.delay(cookingSkill.Traverse());
+            }
+            case COOKINGBANKING -> {
+                //do banking stuff
+                Execution.delay(cookingSkill.handleBanking());
             }
         }
     }
