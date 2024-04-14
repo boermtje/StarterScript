@@ -27,13 +27,17 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-public class Divination extends SkeletonScript {
+import static net.botwithus.rs3.script.ScriptConsole.println;
+
+public class Divination {
     public WispType wispState = WispType.Pale;
     private boolean someBool = true;
     private Random random = new Random();
     public int currentDivinationLevel;
     private SkeletonScriptGraphicsContext GraphicsContext;
     public HashMap<String, Area> Colonies;
+    private SkeletonScript script;
+
     public WispType getCurrentWispType() {
         return wispState;
     }
@@ -57,8 +61,8 @@ public class Divination extends SkeletonScript {
         Luminous,
         Incandescent,
     }
-    public Divination(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition) {
-        super(s, scriptConfig, scriptDefinition);
+    public Divination() {
+        super();
         initializeMaps(); // Call to initialize maps
         initializeLevels(); // Call to initialize levels
         subscribeToSkillUpdates(); // Call to subscribe to skill updates
@@ -66,7 +70,7 @@ public class Divination extends SkeletonScript {
 
     private void subscribeToSkillUpdates() {
         // Subscribe to the SkillUpdateEvent for Divination skill
-        subscribe(SkillUpdateEvent.class, skillUpdateEvent -> {
+        script.subscribe(SkillUpdateEvent.class, skillUpdateEvent -> {
             if (skillUpdateEvent.getId() == Skills.DIVINATION.getId()) {
                 // Update the current Divination level
                 currentDivinationLevel = skillUpdateEvent.getActualLevel();
@@ -139,7 +143,7 @@ public class Divination extends SkeletonScript {
 
     public long moveToColony() {
         if (Movement.traverse(NavPath.resolve(Colonies.get(wispState.name()))) == TraverseEvent.State.FINISHED) {
-            botState = BotState.DIVINATION;
+            script.botState = SkeletonScript.BotState.DIVINATION;
         } else {
             println("Failed to traverse to colony");
         }
@@ -175,9 +179,9 @@ public class Divination extends SkeletonScript {
 
         if (containsMemoryItems()) {
             println("Backpack is still full");
-            botState = BotState.DIVINATIONDEPOSIT;
+            script.botState = SkeletonScript.BotState.DIVINATIONDEPOSIT;
         } else {
-            botState = BotState.DIVINATION;
+            script.botState = SkeletonScript.BotState.DIVINATION;
             println("Backpack is empty");
         }
 
@@ -198,7 +202,7 @@ public class Divination extends SkeletonScript {
         Area area = Colonies.get(wispState.name());
         if (!isInArea(area, player)) {
             System.out.println("Change state to traverse");
-            botState = BotState.DIVINATIONTRAVERSE;
+            script.botState = SkeletonScript.BotState.DIVINATIONTRAVERSE;
             return random.nextLong(500, 800);
         }
 
@@ -210,7 +214,7 @@ public class Divination extends SkeletonScript {
         }
 
         if (Backpack.isFull()) {
-            botState = BotState.DIVINATIONDEPOSIT;
+            script.botState = SkeletonScript.BotState.DIVINATIONDEPOSIT;
         }
 
         else if (player.getAnimationId() == -1) {
