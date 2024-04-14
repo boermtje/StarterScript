@@ -1,14 +1,10 @@
 package net.botwithus;
 
 import net.botwithus.Skills.Divination;
-import net.botwithus.rs3.game.Client;
-import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
-import net.botwithus.rs3.game.skills.Skills;
+import net.botwithus.rs3.game.skills.*;
 import net.botwithus.rs3.imgui.ImGui;
 import net.botwithus.rs3.imgui.ImGuiWindowFlag;
-import net.botwithus.rs3.imgui.NativeBoolean;
 import net.botwithus.rs3.imgui.NativeInteger;
-import net.botwithus.rs3.input.GameInput;
 import net.botwithus.rs3.script.ScriptConsole;
 import net.botwithus.rs3.script.ScriptGraphicsContext;
 
@@ -24,6 +20,7 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     public void removeTask(SkeletonScript.BotState stateToRemove) {
         botStateQueue.removeIf(item -> item.state == stateToRemove);
     }
+    String levelInputText = "0";
 
     public static class BotQueueItem {
         public SkeletonScript.BotState state;
@@ -37,7 +34,7 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         }
     }
 
-    private Skills mapStateToSkill(SkeletonScript.BotState state) {
+    public Skills mapStateToSkill(SkeletonScript.BotState state) {
         // Your logic to map a BotState to a Skills enum value
         // Example:
         switch (state) {
@@ -78,25 +75,32 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
 
                     // Temporary state for new queue item to be added
                     NativeInteger tempSelectedState = new NativeInteger(0);
-                    NativeInteger tempTargetLevel = new NativeInteger(0);
-
+                    levelInputText = ImGui.InputText("Level", levelInputText);
 
                     // Render combo box and level input only if there's at least one state to select
                     if (botStateNames.length > 0) {
                         if (ImGui.Combo("State", tempSelectedState, botStateNames)) {
                             // Combo box selection is registered here
                         }
+                        try {
+                            int level = Integer.parseInt(levelInputText);
 
-                        ImGui.InputInt("Target Level", tempTargetLevel.get());
+                            // Update the NativeInteger field (if you are using one) or use the level directly
+                            // Assuming you have a method or variable to store the parsed level
 
-                        if (ImGui.Button("Add to Queue")) {
-                            // Button to confirm addition to the queue
-                            SkeletonScript.BotState selectedState = botStateMap.get(botStateNames[tempSelectedState.get()]);
-                            Skills selectedSkill = mapStateToSkill(selectedState);
-                            int targetLevel = tempTargetLevel.get();
-                            botStateQueue.add(new BotQueueItem(selectedState, targetLevel, selectedSkill));
+                            // Button logic to add to queue
+                            if (ImGui.Button("Add to Queue")) {
+                                // Use the parsed level to add to your queue
+                                SkeletonScript.BotState selectedState = botStateMap.get(botStateNames[tempSelectedState.get()]);
+                                Skills selectedSkill = mapStateToSkill(selectedState);
+                                botStateQueue.add(new BotQueueItem(selectedState, level, selectedSkill));
+                            }
+                        } catch (NumberFormatException e) {
+                            // Handle invalid number format
+                            System.err.println("Invalid input: Level must be an integer.");
                         }
                     }
+                    ImGui.Separator();
 
                     if (ImGui.Button("Start Queue")) {
                         // Logic to start processing the queue
@@ -183,8 +187,20 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         }
     }
 
-    public int getCurrentSkillLevel(Skills skill) {
-        return skill.getLevel();  // This should call the method that fetches the level for the specified skill
+    public int getCurrentSkillLevel() {
+        if (!botStateQueue.isEmpty()) {
+            BotQueueItem currentItem = botStateQueue.peek(); // Get the current item from the queue
+            Skills currentSkill = mapStateToSkill(currentItem.state); // Map the state to a skill
+            if (currentSkill != null) {
+                return currentSkill.getActualLevel();  // Retrieve the actual level for this skill
+            } else {
+                System.err.println("Skill mapping returned null for state: " + currentItem.state);
+                return -1; // Error handling, adjust as necessary
+            }
+        } else {
+            System.err.println("Queue is empty");
+            return -1;  // Queue is empty, handle as needed
+        }
     }
 
     @Override

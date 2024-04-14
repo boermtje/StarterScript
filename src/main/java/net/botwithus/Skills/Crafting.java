@@ -46,18 +46,6 @@ public class Crafting extends SkeletonScript {
         });
     }
 
-    @Override
-    public void onLoop() {
-        //Loops every 100ms by default, to change:
-        //this.loopDelay = 500;
-        LocalPlayer player = Client.getLocalPlayer();
-        if (player == null || Client.getGameState() != Client.GameState.LOGGED_IN || botState == BotState.IDLE) {
-            //wait some time so we dont immediately start on login.
-            Execution.delay(random.nextLong(3000, 7000));
-            return;
-        }
-    }
-
     public long Traverse() {
         Area.Singular area = new Area.Singular(new Coordinate(2825, 2997, 0));
         if (Bank.isOpen()) {

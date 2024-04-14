@@ -33,15 +33,6 @@ public class Cooking extends SkeletonScript {
         super(s, scriptConfig, scriptDefinition);
     }
 
-    @Override
-    public void onLoop() {
-        LocalPlayer player = Client.getLocalPlayer();
-        if (player == null || Client.getGameState() != Client.GameState.LOGGED_IN || botState == BotState.IDLE) {
-            //wait some time so we dont immediately start on login.
-            Execution.delay(random.nextLong(3000, 7000));
-        }
-    }
-
     public long Traverse() {
         if (Bank.isOpen()) { Bank.close(); }
         if (Movement.traverse(NavPath.resolve(area)) == TraverseEvent.State.FINISHED) {

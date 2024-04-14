@@ -104,16 +104,6 @@ public class RuneCrafting extends SkeletonScript {
         levelRequirements.put("Island_High_29", 90);
     }
 
-    @Override
-    public void onLoop() {
-        //Loops every 100ms by default, to change:
-        this.loopDelay = 5000;
-        LocalPlayer player = Client.getLocalPlayer();
-        if (player == null || Client.getGameState() != Client.GameState.LOGGED_IN || botState == BotState.IDLE) {
-            //wait some time so we dont immediately start on login.
-            Execution.delay(random.nextLong(3000, 7000));
-        }
-    }
     private void moveToIsland(Area island) {
         println("Traversing to island: " + island);
         Movement.traverse(NavPath.resolve(island.getCentroid())); // Ensure this method matches how you handle movement

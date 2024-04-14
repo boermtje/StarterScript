@@ -49,32 +49,21 @@ public class SkeletonScript extends LoopingScript {
         super(s, scriptConfig, scriptDefinition);
         this.sgc = new SkeletonScriptGraphicsContext(getConsole(), this);
         loadConfiguration(); // Load configuration when the script starts
+        GraphicsContext = (SkeletonScriptGraphicsContext) sgc;
     }
 
     @Override
     public void onLoop() {
+        this.loopDelay = 1000;
         LocalPlayer player = Client.getLocalPlayer();
         if (player == null || Client.getGameState() != Client.GameState.LOGGED_IN) {
             Execution.delay(random.nextLong(3000, 7000));
             return;
         }
-
-
-        // Access the queue from the graphics context
-        Queue<SkeletonScriptGraphicsContext.BotQueueItem> queue = GraphicsContext.botStateQueue;
-        if (!queue.isEmpty()) {
-            SkeletonScriptGraphicsContext.BotQueueItem currentItem = queue.peek();
-            int currentLevel = getCurrentSkillLevel(currentItem.skill); // Assuming a method to fetch the level
-
-            if (currentLevel >= currentItem.targetLevel) {
-                queue.poll(); // Remove the completed task
-                if (!queue.isEmpty()) {
-                    setBotState(queue.peek().state); // Set the next state
-                } else {
-                    setBotState(SkeletonScript.BotState.IDLE); // Set to idle if queue is empty
-                }
-            }
-        }
+        Execution.delay(random.nextLong(500, 1000));
+        Execution.delay(random.nextLong(500, 1000));
+        processQueueItems();
+        Execution.delay(random.nextLong(500, 1000));
 
         switch (botState) {
             case IDLE -> {
@@ -142,12 +131,36 @@ public class SkeletonScript extends LoopingScript {
                 Execution.delay(cookingSkill.handleBanking());
             }
         }
+        println("We're done with loop!");
     }
 
-    // Method to fetch the current skill level based on the Skill associated with a BotState
-    private int getCurrentSkillLevel(Skills skill) {
-        // Implementation depends on how skills are managed in your game client interface
-        return skill.getLevel();
+    private void processQueueItems() {
+        println("Starting to process queue items...");
+        if (GraphicsContext.botStateQueue.isEmpty()) {
+            println("Queue is empty.");
+            return;
+        }
+
+        Iterator<SkeletonScriptGraphicsContext.BotQueueItem> iterator = GraphicsContext.botStateQueue.iterator();
+        while (iterator.hasNext()) {
+            SkeletonScriptGraphicsContext.BotQueueItem item = iterator.next();
+            println("Processing item: " + item.state);
+
+            Skills skill = GraphicsContext.mapStateToSkill(item.state);  // Convert state to skill
+            if (skill == null) {
+                println("Skill mapping failed for: " + item.state);
+                continue;
+            }
+
+            int currentSkillLevel = GraphicsContext.getCurrentSkillLevel(); // Get current skill level for this skill
+            println("Current skill level for " + skill + ": " + currentSkillLevel + ", target: " + item.targetLevel);
+
+            if (currentSkillLevel > item.targetLevel) {
+                println("Removing " + item.state + " from queue because current level " + currentSkillLevel + " is greater than target " + item.targetLevel);
+                iterator.remove(); // Correctly remove using iterator
+            }
+        }
+        println("Finished processing queue items.");
     }
 
     ////////////////Save & Load Config/////////////////////

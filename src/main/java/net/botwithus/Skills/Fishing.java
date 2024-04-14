@@ -38,15 +38,6 @@ public class Fishing extends SkeletonScript {
         });
     }
 
-    @Override
-    public void onLoop() {
-        LocalPlayer player = Client.getLocalPlayer();
-        if (player == null || Client.getGameState() != Client.GameState.LOGGED_IN) {
-            Execution.delay(random.nextLong(3000, 7000));
-            return;
-        }
-    }
-
         public long Menaphos (LocalPlayer player){
             Npc fishing = NpcQuery.newQuery().name("Fishing spot").results().nearest();
             if (Backpack.isFull()) {

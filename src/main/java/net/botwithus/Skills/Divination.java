@@ -129,17 +129,6 @@ public class Divination extends SkeletonScript {
         return area.contains(player.getCoordinate());
     }
 
-    @Override
-    public void onLoop() {
-        //Loops every 100ms by default, to change:
-        this.loopDelay = 5000;
-        LocalPlayer player = Client.getLocalPlayer();
-        if (player == null || Client.getGameState() != Client.GameState.LOGGED_IN || botState == BotState.IDLE) {
-            //wait some time so we dont immediately start on login.
-            Execution.delay(random.nextLong(3000, 7000));
-        }
-    }
-
     public WispType getHighestAvailableWisp(int currentLevel) {
         return levelToWispMap.floorEntry(currentLevel).getValue();
     }
