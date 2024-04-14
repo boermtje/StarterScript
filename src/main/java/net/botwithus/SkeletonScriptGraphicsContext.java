@@ -59,8 +59,8 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     public void initializeBotStateMap() {
         botStateMap = new HashMap<>();
         // Initialize states with default values for demonstration
-        botStateMap.put("RuneCrafting State", SkeletonScript.BotState.RUNECRAFTING);
-        botStateMap.put("Divination State", SkeletonScript.BotState.DIVINATION);
+        botStateMap.put("RuneCrafting", SkeletonScript.BotState.RUNECRAFTING);
+        botStateMap.put("Divination", SkeletonScript.BotState.DIVINATION);
 }
 
     @Override
@@ -69,41 +69,33 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
             if (ImGui.BeginTabBar("My bar", ImGuiWindowFlag.None.getValue())) {
                 if (ImGui.BeginTabItem("Main Settings + Queue", ImGuiWindowFlag.None.getValue())) {
                     ImGui.Text("Current script state: " + script.getBotState().name());
-
-                    // Display the queue
-                    // Specify a width and height for the child window
-                    if (ImGui.BeginChild("QueueList", 300.0f, 150.0f, true, 0)) {
-                        for (Iterator<BotQueueItem> iterator = botStateQueue.iterator(); iterator.hasNext();) {
-                            BotQueueItem item = iterator.next();
-                            ImGui.PushID(item.state.name()); // Ensure unique ID for controls
-                            ImGui.Text(item.state.name() + " until level: ");
-                            ImGui.SameLine();
-
-                            int newLevel = ImGui.InputInt("##level" + item.state.name(), item.targetLevel);
-                            if (newLevel != item.targetLevel) {
-                                item.targetLevel = newLevel;
-                            }
-
-                            ImGui.SameLine();
-                            if (ImGui.Button("Remove##" + item.state)) {
-                                iterator.remove(); // Use iterator.remove() to avoid ConcurrentModificationException
-                            }
-                            ImGui.PopID();
-                        }
-                        ImGui.EndChild();
-                    }
                     if (botStateQueue.isEmpty()) {
                         script.setBotState(SkeletonScript.BotState.IDLE);
-                        //Lobby logic
+                        // Lobby logic
                     }
 
-                    // Allow adding new states to the queue
                     String[] botStateNames = botStateMap.keySet().toArray(new String[0]);
-                    selectedItem = new NativeInteger(0); // Manage the selected index
-                    if (ImGui.Combo("Add Bot State", selectedItem, botStateNames)) {
-                        Skills selectedSkill = mapStateToSkill(botStateMap.get(botStateNames[selectedItem.get()]));
-                        // Assuming you want to set a default target level for the new state, e.g., 0
-                        botStateQueue.add(new BotQueueItem(botStateMap.get(botStateNames[selectedItem.get()]), 0, selectedSkill));
+
+                    // Temporary state for new queue item to be added
+                    NativeInteger tempSelectedState = new NativeInteger(0);
+                    NativeInteger tempTargetLevel = new NativeInteger(0);
+
+
+                    // Render combo box and level input only if there's at least one state to select
+                    if (botStateNames.length > 0) {
+                        if (ImGui.Combo("State", tempSelectedState, botStateNames)) {
+                            // Combo box selection is registered here
+                        }
+
+                        ImGui.InputInt("Target Level", tempTargetLevel.get());
+
+                        if (ImGui.Button("Add to Queue")) {
+                            // Button to confirm addition to the queue
+                            SkeletonScript.BotState selectedState = botStateMap.get(botStateNames[tempSelectedState.get()]);
+                            Skills selectedSkill = mapStateToSkill(selectedState);
+                            int targetLevel = tempTargetLevel.get();
+                            botStateQueue.add(new BotQueueItem(selectedState, targetLevel, selectedSkill));
+                        }
                     }
 
                     if (ImGui.Button("Start Queue")) {
@@ -117,12 +109,27 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     if (ImGui.Button("Stop")) {
                         script.setBotState(SkeletonScript.BotState.IDLE);
                     }
+
+                    if (ImGui.BeginChild("QueueList", 400.0f, 150.0f, true, ImGuiWindowFlag.HorizontalScrollbar.getValue())) {
+                        for (Iterator<BotQueueItem> iterator = botStateQueue.iterator(); iterator.hasNext();) {
+                            BotQueueItem item = iterator.next();
+                            ImGui.PushID(item.state.name()); // Ensure unique ID for controls
+                            ImGui.Text(item.state.name() + " until level: " + String.valueOf(item.targetLevel));
+                            ImGui.SameLine();
+                            if (ImGui.Button("Remove##" + item.state)) {
+                                iterator.remove(); // Use iterator.remove() to avoid ConcurrentModificationException
+                            }
+                            ImGui.PopID();
+                        }
+                        ImGui.EndChild();
+                    }
+
                     ImGui.EndTabItem();
                 }
 
 
                 if (ImGui.BeginTabItem("Divination", ImGuiWindowFlag.None.getValue())) {
-                    ImGui.Text("Current Wisp Type: " + (divinationSkill.getwispState()));
+//                    ImGui.Text("Current Wisp Type: " + (divinationSkill.getwispState()));
 //
 //                    if (ImGui.Checkbox("Enable Progressive Mode", progressiveModeEnabled)) {
 //                        progressiveModeEnabled = !progressiveModeEnabled;
