@@ -6,6 +6,7 @@ import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
 import net.botwithus.rs3.game.skills.Skills;
 import net.botwithus.rs3.imgui.ImGui;
 import net.botwithus.rs3.imgui.ImGuiWindowFlag;
+import net.botwithus.rs3.imgui.NativeBoolean;
 import net.botwithus.rs3.imgui.NativeInteger;
 import net.botwithus.rs3.input.GameInput;
 import net.botwithus.rs3.script.ScriptConsole;
@@ -60,11 +61,7 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         // Initialize states with default values for demonstration
         botStateMap.put("RuneCrafting State", SkeletonScript.BotState.RUNECRAFTING);
         botStateMap.put("Divination State", SkeletonScript.BotState.DIVINATION);
-
-        // Assuming each state has a default starting skill level target
-        botStateQueue.add(new BotQueueItem(SkeletonScript.BotState.DIVINATION, 50, Skills.DIVINATION));
-        botStateQueue.add(new BotQueueItem(SkeletonScript.BotState.RUNECRAFTING, 30, Skills.RUNECRAFTING));
-    }
+}
 
     @Override
     public void drawSettings() {
@@ -111,6 +108,10 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
 
                     if (ImGui.Button("Start Queue")) {
                         // Logic to start processing the queue
+                        if (!botStateQueue.isEmpty()) {
+                            BotQueueItem currentItem = botStateQueue.peek();
+                            script.setBotState(currentItem.state);
+                        }
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("Stop")) {
@@ -118,6 +119,8 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     }
                     ImGui.EndTabItem();
                 }
+
+
                 if (ImGui.BeginTabItem("Divination", ImGuiWindowFlag.None.getValue())) {
                     ImGui.Text("Current Wisp Type: " + (divinationSkill.getwispState()));
 
@@ -152,6 +155,8 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     }
                     ImGui.EndTabItem();
                 }
+
+
                 if (ImGui.BeginTabItem("Runecrafting", ImGuiWindowFlag.None.getValue())) {
                     ImGui.Text("My scripts state is: " + script.getBotState());
                     if (ImGui.Button("Start")) {
