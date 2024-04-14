@@ -17,12 +17,6 @@ public class SkeletonScript extends LoopingScript {
     public BotState botState = BotState.IDLE;
     private Random random = new Random();
     private SkeletonScriptGraphicsContext GraphicsContext;
-    private Crafting craftingSkill;
-    private Fishing fishingSkill;
-    private RuneCrafting runecraftingSkill;
-    private Cooking cookingSkill;
-    private Divination divinationSkill;
-    Divination divination = new Divination();
 
     /////////////////////////////////////Botstate//////////////////////////
     public enum BotState {
