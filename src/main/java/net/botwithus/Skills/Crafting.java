@@ -46,7 +46,7 @@ public class Crafting extends SkeletonScript {
         });
     }
 
-    public static long Traverse() {
+    public long Traverse() {
         Area.Singular area = new Area.Singular(new Coordinate(2825, 2997, 0));
         if (Bank.isOpen()) {
             Bank.close();
@@ -67,7 +67,7 @@ public class Crafting extends SkeletonScript {
         }
     }
 
-    public static long handleSkilling(LocalPlayer player) {
+    public long handleSkilling(LocalPlayer player) {
         SceneObject gemRock = SceneObjectQuery.newQuery().name("Precious gem rock").option("Mine").results().nearest();
         Area.Rectangular area = new Area.Rectangular(new Coordinate(2827, 2296, 0), new Coordinate(2822, 3002, 0));
         //if our inventory is full, lets bank.
@@ -92,7 +92,7 @@ public class Crafting extends SkeletonScript {
         return random.nextLong(1000, 2000);
     }
 
-    public static long Banking() {
+    public long Banking() {
         //go to area
         Area.Rectangular areas = new Area.Rectangular(new Coordinate(2848, 2958, 0), new Coordinate(2855, 2953, 0));
         if (Movement.traverse(NavPath.resolve(areas)) == TraverseEvent.State.FINISHED) {

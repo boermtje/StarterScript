@@ -38,7 +38,7 @@ public class Fishing extends SkeletonScript {
         });
     }
 
-        public static long Menaphos(LocalPlayer player){
+        public long Menaphos(LocalPlayer player){
             Npc fishing = NpcQuery.newQuery().name("Fishing spot").results().nearest();
             if (Backpack.isFull()) {
                 println("Inventory is full.");
@@ -54,7 +54,7 @@ public class Fishing extends SkeletonScript {
             return random.nextLong(500, 1000);
         }
 
-        public static long MenaBanking() {
+        public long MenaBanking() {
             SceneObject Bank = SceneObjectQuery.newQuery().name("Bank chest").results().nearest();
             Execution.delay(random.nextLong(1000, 3000));
             Bank.interact("Load Last Preset from");
@@ -63,7 +63,7 @@ public class Fishing extends SkeletonScript {
             return random.nextLong(1500, 3000);
         }
 
-        public static long handleSkilling(LocalPlayer player){
+        public long handleSkilling(LocalPlayer player){
             Area.Polygonal area = new Area.Polygonal(
                     new Coordinate(2833, 2973, 0),
                     new Coordinate(2849, 2973, 0),
@@ -94,7 +94,7 @@ public class Fishing extends SkeletonScript {
             return random.nextLong(500, 1000);
         }
 
-        public static long Banking() {
+        public long Banking() {
             //go to area
             isSkilling = false;
             if (Bank.isOpen()) {

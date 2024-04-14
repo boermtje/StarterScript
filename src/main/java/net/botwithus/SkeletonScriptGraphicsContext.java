@@ -209,4 +209,3 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         super.drawOverlay();
     }
 }
-
