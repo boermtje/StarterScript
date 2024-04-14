@@ -29,6 +29,8 @@ public class Cooking extends SkeletonScript {
     SkeletonScriptGraphicsContext GraphicsContext;
     private Random random = new Random();
     Area.Rectangular area = new Area.Rectangular(new Coordinate(2792, 3455, 0), new Coordinate(2808, 3437, 0));
+
+
     public Cooking(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition) {
         super(s, scriptConfig, scriptDefinition);
     }

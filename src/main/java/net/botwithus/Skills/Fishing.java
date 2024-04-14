@@ -1,6 +1,7 @@
 package net.botwithus.Skills;
 
 import net.botwithus.SkeletonScript;
+import net.botwithus.SkeletonScriptGraphicsContext;
 import net.botwithus.internal.scripts.ScriptDefinition;
 import net.botwithus.rs3.script.config.ScriptConfig;
 import net.botwithus.api.game.hud.inventories.Backpack;
@@ -23,12 +24,14 @@ import net.botwithus.rs3.game.Coordinate;
 import java.util.*;
 
 public class Fishing extends SkeletonScript {
+    private SkeletonScriptGraphicsContext GraphicsContext;
     public int fishGained = 0;
     private boolean isSkilling = false;
     private Random random = new Random();
 
-    public Fishing(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition) {
+    public Fishing(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition, SkeletonScriptGraphicsContext graphicsContext) {
         super(s, scriptConfig, scriptDefinition);
+        GraphicsContext = graphicsContext;
         //Subscribe to InventoryUpdateEvent
         subscribe(InventoryUpdateEvent.class, inventoryUpdateEvent -> {
             if (isSkilling) {

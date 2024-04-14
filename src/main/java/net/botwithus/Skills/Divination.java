@@ -29,22 +29,22 @@ import java.util.regex.Pattern;
 
 import static net.botwithus.rs3.script.ScriptConsole.println;
 
-public class Divination {
-    public WispType wispState = WispType.Pale;
+public class Divination extends SkeletonScript {
+    public static WispType wispState = WispType.Pale;
     private boolean someBool = true;
     private Random random = new Random();
-    public int currentDivinationLevel;
+    public static int currentDivinationLevel;
     private SkeletonScriptGraphicsContext GraphicsContext;
     public HashMap<String, Area> Colonies;
     private SkeletonScript script;
 
-    public WispType getCurrentWispType() {
+    public static WispType getCurrentWispType() {
         return wispState;
     }
     public void setCurrentWispType(WispType wispType) {
         this.wispState = wispType;
     }
-    private final NavigableMap<Integer, WispType> levelToWispMap = new TreeMap<>();
+    private static final NavigableMap<Integer, WispType> levelToWispMap = new TreeMap<>();
 
     public enum WispType {
         Pale,
@@ -61,8 +61,9 @@ public class Divination {
         Luminous,
         Incandescent,
     }
-    public Divination() {
-        super();
+    public Divination(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition, SkeletonScriptGraphicsContext graphicsContext) {
+        super(s, scriptConfig, scriptDefinition);
+        GraphicsContext = graphicsContext;
         initializeMaps(); // Call to initialize maps
         initializeLevels(); // Call to initialize levels
         subscribeToSkillUpdates(); // Call to subscribe to skill updates
@@ -133,7 +134,7 @@ public class Divination {
         return area.contains(player.getCoordinate());
     }
 
-    public WispType getHighestAvailableWisp(int currentLevel) {
+    public static WispType getHighestAvailableWisp(int currentLevel) {
         return levelToWispMap.floorEntry(currentLevel).getValue();
     }
 
@@ -241,12 +242,12 @@ public class Divination {
     }
 
 
-    public WispType getwispState() {
+    public static WispType getwispState() {
         return wispState;
     }
 
-    public void setWispType(WispType wispType) {
-        this.wispState = wispType;
+    public static void setWispType(WispType wispType) {
+        wispState = wispType;
     }
 
     public boolean isSomeBool() {

@@ -22,7 +22,6 @@ public class SkeletonScript extends LoopingScript {
     private RuneCrafting runecraftingSkill;
     private Cooking cookingSkill;
     private Divination divinationSkill;
-    Divination divination = new Divination();
 
     /////////////////////////////////////Botstate//////////////////////////
     public enum BotState {
