@@ -30,15 +30,15 @@ import java.util.regex.Pattern;
 import static net.botwithus.rs3.script.ScriptConsole.println;
 
 public class Divination {
-    public WispType wispState = WispType.Pale;
+    public static WispType wispState = WispType.Pale;
     private boolean someBool = true;
     private Random random = new Random();
-    public int currentDivinationLevel;
+    public static int currentDivinationLevel;
     private SkeletonScriptGraphicsContext GraphicsContext;
     public HashMap<String, Area> Colonies;
     private SkeletonScript script;
 
-    public WispType getCurrentWispType() {
+    public static WispType getCurrentWispType() {
         return wispState;
     }
     public void setCurrentWispType(WispType wispType) {
@@ -133,7 +133,7 @@ public class Divination {
         return area.contains(player.getCoordinate());
     }
 
-    public WispType getHighestAvailableWisp(int currentLevel) {
+    public static WispType getHighestAvailableWisp(int currentLevel) {
         return levelToWispMap.floorEntry(currentLevel).getValue();
     }
 
@@ -141,7 +141,7 @@ public class Divination {
         setCurrentWispType(getHighestAvailableWisp(currentLevel));
     }
 
-    public long moveToColony() {
+    public static long moveToColony() {
         if (Movement.traverse(NavPath.resolve(Colonies.get(wispState.name()))) == TraverseEvent.State.FINISHED) {
             script.botState = SkeletonScript.BotState.DIVINATION;
         } else {
@@ -150,7 +150,7 @@ public class Divination {
         return random.nextLong(1000, 1500);
     }
 
-    public long deposit() {
+    public static long deposit() {
         long startTime = System.currentTimeMillis();
         long maxDuration = 180000; // 3 minutes in milliseconds
 
@@ -198,7 +198,7 @@ public class Divination {
         return false;
     }
 
-    public long handleSkilling(LocalPlayer player, String WispType) {
+    public static long handleSkilling(LocalPlayer player, String WispType) {
         Area area = Colonies.get(wispState.name());
         if (!isInArea(area, player)) {
             System.out.println("Change state to traverse");
@@ -241,11 +241,11 @@ public class Divination {
     }
 
 
-    public WispType getwispState() {
+    public static WispType getwispState() {
         return wispState;
     }
 
-    public void setWispType(WispType wispType) {
+    public static void setWispType(WispType wispType) {
         this.wispState = wispType;
     }
 

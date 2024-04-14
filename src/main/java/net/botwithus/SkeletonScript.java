@@ -67,35 +67,35 @@ public class SkeletonScript extends LoopingScript {
             }
             case DIVINATION -> {
                 //do questing stuff
-                Execution.delay(divinationSkill.handleSkilling(player, divinationSkill.wispState.name()));
+                Execution.delay(Divination.handleSkilling(player, Divination.wispState.name()));
             }
             case DIVINATIONDEPOSIT -> {
                 //do deposit stuff
-                Execution.delay(divinationSkill.deposit());
+                Execution.delay(Divination.deposit());
             }
             case DIVINATIONTRAVERSE -> {
                 //do traverse stuff
-                Execution.delay(divinationSkill.moveToColony());
+                Execution.delay(Divination.moveToColony());
             }
             case CRAFTINGSKILLING -> {
                 //do crafting stuff
-                Execution.delay(craftingSkill.handleSkilling(player));
+                Execution.delay(Crafting.handleSkilling(player));
             }
             case CRAFTINGTRAVERSE -> {
                 //do traverse stuff
-                Execution.delay(craftingSkill.Traverse());
+                Execution.delay(Crafting.Traverse());
             }
             case CRAFTINGBANKING -> {
                 //do banking stuff
-                Execution.delay(craftingSkill.Banking());
+                Execution.delay(Crafting.Banking());
             }
             case FISHINGSKILLING -> {
                 //do fishing stuff
-                Execution.delay(fishingSkill.handleSkilling(player));
+                Execution.delay(Fishing.handleSkilling(player));
             }
             case FISHINGBANKING -> {
                 //do banking stuff
-                Execution.delay(fishingSkill.Banking());
+                Execution.delay(Fishing.Banking());
             }
 //            case FISHINGTRAVERSE -> {
 //                //do traverse stuff
@@ -103,34 +103,30 @@ public class SkeletonScript extends LoopingScript {
 //            }
             case FISHINGMENAPHOS -> {
                 //do traverse stuff
-                Execution.delay(fishingSkill.Menaphos(player));
+                Execution.delay(Fishing.Menaphos(player));
             }
             case FISHINGMENABANKING -> {
                 //do banking stuff
-                Execution.delay(fishingSkill.MenaBanking());
+                Execution.delay(Fishing.MenaBanking());
             }
             case RUNECRAFTING -> {
                 //do runecrafting stuff
-                Execution.delay(runecraftingSkill.interactWithPriorityObjects(player));;
+                Execution.delay(RuneCrafting.interactWithPriorityObjects(player));;
             }
             case COOKINGSKILLING -> {
                 //do cooking stuff
-                Execution.delay(cookingSkill.handleCooking(player));
+                Execution.delay(Cooking.handleCooking(player));
             }
             case COOKINGTRAVERSE -> {
                 //do traverse stuff
-                Execution.delay(cookingSkill.Traverse());
+                Execution.delay(Cooking.Traverse());
             }
             case COOKINGBANKING -> {
                 //do banking stuff
-                Execution.delay(cookingSkill.handleBanking());
+                Execution.delay(Cooking.handleBanking());
             }
         }
         println("We're done with loop!");
-    }
-
-    public Divination getDivinationSkill() {
-        return divinationSkill;
     }
 
     private void processQueueItems() {
@@ -169,7 +165,7 @@ public class SkeletonScript extends LoopingScript {
             if (selectedWispTypeName != null && !selectedWispTypeName.isEmpty()) {
                 // Convert the saved name back to a WispType enum
                 Divination.WispType selectedWispType = Divination.WispType.valueOf(selectedWispTypeName);
-                divinationSkill.setWispType(selectedWispType);
+                Divination.setWispType(selectedWispType);
                 println("WispType configuration loaded successfully: " + selectedWispType.name());
             }
 
@@ -189,7 +185,7 @@ public class SkeletonScript extends LoopingScript {
     void saveConfiguration() {
         try {
             // Save the selected WispType using its name
-            configuration.addProperty("selectedWispType", divinationSkill.getCurrentWispType().name());
+            configuration.addProperty("selectedWispType", Divination.getCurrentWispType().name());
             configuration.addProperty("progressiveModeEnabled", String.valueOf(GraphicsContext.progressiveModeEnabled));
             configuration.save();
             println("WispType configuration saved successfully.");

@@ -169,7 +169,7 @@ public class RuneCrafting extends SkeletonScript {
         println("No eligible objects found for interaction in the current island.");
     }
 
-    public long interactWithPriorityObjects(LocalPlayer player) {
+    public static long interactWithPriorityObjects(LocalPlayer player) {
         println("We are within the interactWithPriorityObjects method");
         Area bestIsland = getBestAvailableIsland();
         if (bestIsland != null && !bestIsland.contains(player.getCoordinate())) {

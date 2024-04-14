@@ -33,7 +33,7 @@ public class Cooking extends SkeletonScript {
         super(s, scriptConfig, scriptDefinition);
     }
 
-    public long Traverse() {
+    public static long Traverse() {
         if (Bank.isOpen()) { Bank.close(); }
         if (Movement.traverse(NavPath.resolve(area)) == TraverseEvent.State.FINISHED) {
             botState = BotState.COOKINGSKILLING;
@@ -45,7 +45,7 @@ public class Cooking extends SkeletonScript {
 
 
 
-    public long handleCooking(LocalPlayer player) {
+    public static long handleCooking(LocalPlayer player) {
         if (area.contains(player)) {
             SceneObject Cookingrange = SceneObjectQuery.newQuery().id(45319).results().nearest();
             Execution.delay(random.nextLong(500, 1000));
@@ -63,7 +63,7 @@ public class Cooking extends SkeletonScript {
         return random.nextLong(500, 1000);
     }
 
-    public long handleBanking() {
+    public static long handleBanking() {
         EntityResultSet<SceneObject> BankBooths = SceneObjectQuery.newQuery().id(104414).option("Bank").results();
         SceneObject Banks = BankBooths.random();
         if (Banks != null) {

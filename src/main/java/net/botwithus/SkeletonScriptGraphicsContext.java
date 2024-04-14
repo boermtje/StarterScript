@@ -14,6 +14,7 @@ import java.util.*;
 public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     private SkeletonScript script;
     private NativeInteger selectedItem;
+    //    private Divination divinationSkill;
     public boolean progressiveModeEnabled = false;
     private Map<String, SkeletonScript.BotState> botStateMap;
     public Queue<BotQueueItem> botStateQueue = new LinkedList<>();
@@ -58,7 +59,7 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         // Initialize states with default values for demonstration
         botStateMap.put("RuneCrafting", SkeletonScript.BotState.RUNECRAFTING);
         botStateMap.put("Divination", SkeletonScript.BotState.DIVINATION);
-}
+    }
 
     @Override
     public void drawSettings() {
@@ -140,15 +141,15 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     if (ImGui.Button("Stop Div")) {
                         script.setBotState(SkeletonScript.BotState.IDLE);
                     }
-                    ImGui.Text("Current Wisp Type: " + (divinationSkill.getwispState()));
+                    ImGui.Text("Current Wisp Type: " + (Divination.getwispState()));
 
                     if (ImGui.Checkbox("Enable Progressive Mode", progressiveModeEnabled)) {
                         progressiveModeEnabled = !progressiveModeEnabled;
                         // If progressive mode just got enabled, automatically set the highest available wisp type
                         if (progressiveModeEnabled) {
-                            int currentLevel = divinationSkill.currentDivinationLevel;
-                            Divination.WispType highestAvailableWisp = divinationSkill.getHighestAvailableWisp(currentLevel);
-                            divinationSkill.setWispType(highestAvailableWisp);
+                            int currentLevel = Divination.currentDivinationLevel;
+                            Divination.WispType highestAvailableWisp = Divination.getHighestAvailableWisp(currentLevel);
+                            Divination.setWispType(highestAvailableWisp);
                         }
                         script.saveConfiguration(); // Save the new selection
                     }
@@ -157,10 +158,10 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                         String[] wispTypes = Arrays.stream(Divination.WispType.values())
                                 .map(Enum::name)
                                 .toArray(String[]::new);
-                        NativeInteger selectedWisp = new NativeInteger(divinationSkill.getCurrentWispType().ordinal());
+                        NativeInteger selectedWisp = new NativeInteger(Divination.getCurrentWispType().ordinal());
                         if (ImGui.Combo("Wisp Type", selectedWisp, wispTypes)) {
                             Divination.WispType newWispType = Divination.WispType.values()[selectedWisp.get()];
-                            divinationSkill.setWispType(newWispType);
+                            Divination.setWispType(newWispType);
                             script.saveConfiguration(); // Save the new selection
                         }
                     }
