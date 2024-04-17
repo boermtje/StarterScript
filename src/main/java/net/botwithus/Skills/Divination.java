@@ -24,9 +24,9 @@ import static net.botwithus.rs3.script.ScriptConsole.println;
 
 public class Divination {
     public static WispType wispState = WispType.Pale;
-    private Random random = new Random();
+    private static Random random = new Random();
     public static int currentDivinationLevel;
-    public HashMap<String, Area> Colonies;
+    public static HashMap<String, Area> Colonies;
 
     public static WispType getCurrentWispType() {
         return wispState;
@@ -99,7 +99,7 @@ public class Divination {
         Colonies.put("Incandescent", Incandescent);
     }
 
-    public boolean isInArea(Area area, LocalPlayer player) {
+    public static boolean isInArea(Area area, LocalPlayer player) {
         // Check if player's coordinate is within the area
         return area.contains(player.getCoordinate());
     }
@@ -161,10 +161,10 @@ public class Divination {
         return false;
     }
 
-    public long handleSkilling(LocalPlayer player, String WispType) {
+    public static long handleSkilling(LocalPlayer player, String WispType) {
         Area area = Colonies.get(wispState.name());
         if (!isInArea(area, player)) {
-            System.out.println("Change state to traverse");
+            println("Change state to traverse");
             SkeletonScript.botState = SkeletonScript.BotState.DIVINATIONTRAVERSE;
             return random.nextLong(500, 800);
         }

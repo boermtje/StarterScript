@@ -51,11 +51,14 @@ public class SkeletonScript extends LoopingScript {
         this.divinationInstance = new Divination();
     }
 
-        private void subscribeToSkillUpdates() {
-        Skills.DIVINATION.getActualLevel();
-        //Use levelToWispMap to get the wisp type for the current level
-        Divination.WispType wispType = Divination.levelToWispMap.floorEntry(currentDivinationLevel).getValue();
-        Divination.setWispType(wispType);
+    private void subscribeToSkillUpdates() {
+        try {
+            int level = Skills.DIVINATION.getActualLevel(); // Example of fetching current level
+            Divination.WispType wispType = Divination.levelToWispMap.floorEntry(level).getValue();
+            Divination.setWispType(wispType);
+        } catch (Exception e) {
+            println("Failed to subscribe to skill updates: " + e.getMessage());
+        }
     }
 
     @Override
@@ -71,9 +74,6 @@ public class SkeletonScript extends LoopingScript {
         processQueueItems();
         Execution.delay(random.nextLong(500, 1000));
 
-//        println("Update Best Wisp");
-//        subscribeToSkillUpdates();
-
         switch (botState) {
             case IDLE -> {
                 println("We're idle!");
@@ -81,8 +81,10 @@ public class SkeletonScript extends LoopingScript {
             }
             case DIVINATION -> {
                 //do questing stuff
-                println("We're doing divination!");
-                Execution.delay(divinationInstance.handleSkilling(player, Divination.wispState.name()));
+                Execution.delay(Divination.handleSkilling(player, Divination.wispState.name()));
+                if (GraphicsContext.progressiveModeEnabled) {
+                    subscribeToSkillUpdates();
+                }
             }
             case DIVINATIONDEPOSIT -> {
                 //do deposit stuff
@@ -141,7 +143,6 @@ public class SkeletonScript extends LoopingScript {
 //                Execution.delay(Cooking.handleBanking());
 //            }
         }
-        println("We're done with loop!");
     }
 
     //this is a method that will process the queue items
