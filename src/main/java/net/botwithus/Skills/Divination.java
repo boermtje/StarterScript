@@ -13,16 +13,16 @@ import net.botwithus.rs3.game.queries.builders.objects.SceneObjectQuery;
 import net.botwithus.rs3.game.scene.entities.characters.npc.Npc;
 import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
 import net.botwithus.rs3.game.scene.entities.object.SceneObject;
+import net.botwithus.rs3.imgui.ImGui;
+import net.botwithus.rs3.imgui.NativeInteger;
 import net.botwithus.rs3.script.Execution;
 import net.botwithus.rs3.game.*;
 import net.botwithus.rs3.util.Regex;
 
-import java.util.HashMap;
-import java.util.NavigableMap;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Pattern;
 
+import static net.botwithus.SkeletonScriptGraphicsContext.progressiveModeEnabled;
 import static net.botwithus.rs3.script.ScriptConsole.println;
 
 public class Divination {
@@ -78,6 +78,28 @@ public class Divination {
 //            }
 //        });
 //    }
+
+    private void ProgressiveMode() {
+        if (progressiveModeEnabled) {
+            int currentLevel = Divination.currentDivinationLevel;
+            Divination.WispType highestAvailableWisp = Divination.getHighestAvailableWisp(currentLevel);
+            Divination.setWispType(highestAvailableWisp);
+            println("Progressive mode enabled");
+            script.saveConfiguration(); // Save the new selection
+        }
+
+        if (!progressiveModeEnabled) {
+            String[] wispTypes = Arrays.stream(Divination.WispType.values())
+                    .map(Enum::name)
+                    .toArray(String[]::new);
+            NativeInteger selectedWisp = new NativeInteger(Divination.getCurrentWispType().ordinal());
+            if (ImGui.Combo("Wisp Type", selectedWisp, wispTypes)) {
+                Divination.WispType newWispType = Divination.WispType.values()[selectedWisp.get()];
+                Divination.setWispType(newWispType);
+                script.saveConfiguration(); // Save the new selection
+            }
+        }
+    }
 
     private void initializeLevels (){
         // Initialize the wisp level map

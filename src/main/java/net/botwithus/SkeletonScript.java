@@ -206,7 +206,7 @@ public class SkeletonScript extends LoopingScript {
         }
     }
 
-    void saveConfiguration() {
+    public void saveConfiguration() {
         try {
             // Save the selected WispType using its name
             configuration.addProperty("selectedWispType", Divination.getCurrentWispType().name());
