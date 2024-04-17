@@ -2,7 +2,6 @@ package net.botwithus;
 
 import net.botwithus.Skills.*;
 import net.botwithus.internal.scripts.ScriptDefinition;
-import net.botwithus.rs3.game.Area;
 import net.botwithus.rs3.game.Client;
 import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
 import net.botwithus.rs3.game.skills.Skills;
@@ -14,6 +13,7 @@ import net.botwithus.rs3.script.config.ScriptConfig;
 import java.util.*;
 
 public class SkeletonScript extends LoopingScript {
+    private Divination divinationInstance;
     public BotState botState = BotState.IDLE;
     private Random random = new Random();
     private SkeletonScriptGraphicsContext GraphicsContext;
@@ -45,6 +45,7 @@ public class SkeletonScript extends LoopingScript {
         this.sgc = new SkeletonScriptGraphicsContext(getConsole(), this);
         loadConfiguration(); // Load configuration when the script starts
         GraphicsContext = (SkeletonScriptGraphicsContext) sgc;
+        this.divinationInstance = new Divination(s, scriptConfig, scriptDefinition, (SkeletonScriptGraphicsContext) this.sgc);
 }
 
     @Override
@@ -67,68 +68,71 @@ public class SkeletonScript extends LoopingScript {
             }
             case DIVINATION -> {
                 //do questing stuff
-                Execution.delay(Divination.handleSkilling(player, Divination.wispState.name()));
+                Execution.delay(divinationInstance.handleSkilling(player, Divination.wispState.name()));
             }
             case DIVINATIONDEPOSIT -> {
                 //do deposit stuff
-                Execution.delay(Divination.deposit());
+                Execution.delay(divinationInstance.deposit());
             }
             case DIVINATIONTRAVERSE -> {
                 //do traverse stuff
-                Execution.delay(Divination.moveToColony());
+                Execution.delay(divinationInstance.moveToColony());
             }
-            case CRAFTINGSKILLING -> {
-                //do crafting stuff
-                Execution.delay(Crafting.handleSkilling(player));
-            }
-            case CRAFTINGTRAVERSE -> {
-                //do traverse stuff
-                Execution.delay(Crafting.Traverse());
-            }
-            case CRAFTINGBANKING -> {
-                //do banking stuff
-                Execution.delay(Crafting.Banking());
-            }
-            case FISHINGSKILLING -> {
-                //do fishing stuff
-                Execution.delay(Fishing.handleSkilling(player));
-            }
-            case FISHINGBANKING -> {
-                //do banking stuff
-                Execution.delay(Fishing.Banking());
-            }
-//            case FISHINGTRAVERSE -> {
-//                //do traverse stuff
-//                Execution.delay(fishingSkill.Menaphos(player));
+//            case CRAFTINGSKILLING -> {
+//                //do crafting stuff
+//                Execution.delay(Crafting.handleSkilling(player));
 //            }
-            case FISHINGMENAPHOS -> {
-                //do traverse stuff
-                Execution.delay(Fishing.Menaphos(player));
-            }
-            case FISHINGMENABANKING -> {
-                //do banking stuff
-                Execution.delay(Fishing.MenaBanking());
-            }
-            case RUNECRAFTING -> {
-                //do runecrafting stuff
-                Execution.delay(RuneCrafting.interactWithPriorityObjects(player));;
-            }
-            case COOKINGSKILLING -> {
-                //do cooking stuff
-                Execution.delay(Cooking.handleCooking(player));
-            }
-            case COOKINGTRAVERSE -> {
-                //do traverse stuff
-                Execution.delay(Cooking.Traverse());
-            }
-            case COOKINGBANKING -> {
-                //do banking stuff
-                Execution.delay(Cooking.handleBanking());
-            }
+//            case CRAFTINGTRAVERSE -> {
+//                //do traverse stuff
+//                Execution.delay(Crafting.Traverse());
+//            }
+//            case CRAFTINGBANKING -> {
+//                //do banking stuff
+//                Execution.delay(Crafting.Banking());
+//            }
+//            case FISHINGSKILLING -> {
+//                //do fishing stuff
+//                Execution.delay(Fishing.handleSkilling(player));
+//            }
+//            case FISHINGBANKING -> {
+//                //do banking stuff
+//                Execution.delay(Fishing.Banking());
+//            }
+////            case FISHINGTRAVERSE -> {
+////                //do traverse stuff
+////                Execution.delay(fishingSkill.Menaphos(player));
+////            }
+//            case FISHINGMENAPHOS -> {
+//                //do traverse stuff
+//                Execution.delay(Fishing.Menaphos(player));
+//            }
+//            case FISHINGMENABANKING -> {
+//                //do banking stuff
+//                Execution.delay(Fishing.MenaBanking());
+//            }
+//            case RUNECRAFTING -> {
+//                //do runecrafting stuff
+//                Execution.delay(RuneCrafting.interactWithPriorityObjects(player));;
+//            }
+//            case COOKINGSKILLING -> {
+//                //do cooking stuff
+//                Execution.delay(Cooking.handleCooking(player));
+//            }
+//            case COOKINGTRAVERSE -> {
+//                //do traverse stuff
+//                Execution.delay(Cooking.Traverse());
+//            }
+//            case COOKINGBANKING -> {
+//                //do banking stuff
+//                Execution.delay(Cooking.handleBanking());
+//            }
         }
         println("We're done with loop!");
     }
 
+    //this is a method that will process the queue items
+    //it will iterate through the queue and check if the current level is greater than the target level
+    //if it is, it will remove the item from the queue
     private void processQueueItems() {
         println("Starting to process queue items...");
         if (GraphicsContext.botStateQueue.isEmpty()) {

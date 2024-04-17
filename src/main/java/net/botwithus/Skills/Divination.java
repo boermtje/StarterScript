@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import static net.botwithus.rs3.script.ScriptConsole.println;
 
 public class Divination extends SkeletonScript {
+    private static Divination instance;
     public static WispType wispState = WispType.Pale;
     private boolean someBool = true;
     private Random random = new Random();
@@ -67,6 +68,13 @@ public class Divination extends SkeletonScript {
         initializeMaps(); // Call to initialize maps
         initializeLevels(); // Call to initialize levels
         subscribeToSkillUpdates(); // Call to subscribe to skill updates
+    }
+
+    public static Divination getInstance(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition, SkeletonScriptGraphicsContext graphicsContext) {
+        if (instance == null) {
+            instance = new Divination(s, scriptConfig, scriptDefinition, graphicsContext);
+        }
+        return instance;
     }
 
     private void subscribeToSkillUpdates() {
