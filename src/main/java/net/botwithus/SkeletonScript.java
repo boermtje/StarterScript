@@ -37,8 +37,8 @@ public class SkeletonScript extends LoopingScript {
         FISHINGTRAVERSE,
         FISHINGMENAPHOS,
         FISHINGMENABANKING,
-        RUNECRAFTINGSKILLING,
-//        RUNECRAFTINGTRAVERSE,
+        RUNECRAFTING,
+        RUNECRAFTINGTRAVERSE,
         COOKINGSKILLING,
         COOKINGTRAVERSE,
         COOKINGBANKING
@@ -128,14 +128,14 @@ public class SkeletonScript extends LoopingScript {
 //                //do banking stuff
 //                Execution.delay(Fishing.MenaBanking());
 //            }
-            case RUNECRAFTINGSKILLING -> {
+            case RUNECRAFTING -> {
                 //do runecrafting stuff
                 Execution.delay(RuneCrafting.interactWithPriorityObjects(player));;
             }
-//            case RUNECRAFTINGTRAVERSE -> {
-//                //do traverse stuff
-//                Execution.delay(RuneCrafting.mo());
-//            }
+            case RUNECRAFTINGTRAVERSE -> {
+                //do traverse stuff
+                Execution.delay(RuneCrafting.moveToIsland());
+            }
 //            case COOKINGSKILLING -> {
 //                //do cooking stuff
 //                Execution.delay(Cooking.handleCooking(player));

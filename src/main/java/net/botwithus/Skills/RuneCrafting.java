@@ -1,11 +1,8 @@
 package net.botwithus.Skills;
 
-import net.botwithus.SkeletonScript;
-import net.botwithus.internal.scripts.ScriptDefinition;
 import net.botwithus.rs3.game.movement.Movement;
 import net.botwithus.rs3.game.movement.NavPath;
 import net.botwithus.rs3.game.movement.TraverseEvent;
-import net.botwithus.rs3.script.config.ScriptConfig;
 import net.botwithus.rs3.game.queries.builders.characters.NpcQuery;
 import net.botwithus.rs3.game.queries.builders.items.InventoryItemQuery;
 import net.botwithus.rs3.game.queries.builders.objects.SceneObjectQuery;
@@ -15,7 +12,6 @@ import net.botwithus.rs3.game.scene.entities.characters.npc.Npc;
 import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
 import net.botwithus.rs3.game.scene.entities.object.SceneObject;
 import net.botwithus.rs3.script.Execution;
-import net.botwithus.rs3.events.impl.SkillUpdateEvent;
 import net.botwithus.rs3.game.skills.Skills;
 import net.botwithus.rs3.game.*;
 import net.botwithus.rs3.util.RandomGenerator;
@@ -31,6 +27,7 @@ public class RuneCrafting {
     private HashMap<String, Integer> priorityNPCs;
     private static HashMap<String, Area> islands;
     private static HashMap<String, Integer> levelRequirements;
+    private static Area bestIsland = getBestAvailableIsland();
 
     public RuneCrafting() {
         initializeMaps(); // Call to initialize maps
@@ -105,11 +102,13 @@ public class RuneCrafting {
         levelRequirements.put("Island_High_29", 90);
     }
 
-    private static void moveToIsland(Area island) {
-        println("Traversing to island: " + island);
-        if (Movement.traverse(NavPath.resolve(island)) == TraverseEvent.State.FINISHED) {
+    public static long moveToIsland() {
+        println("Traversing to island: " + bestIsland);
+        if (Movement.traverse(NavPath.resolve(bestIsland)) == TraverseEvent.State.FINISHED) {
+            println("Done");
             Execution.delay(random.nextInt(100,500));
         }
+        return random.nextInt(100,500);
     }
 
     private static boolean hasRune_Essence() {
@@ -173,22 +172,23 @@ public class RuneCrafting {
 
     public static long interactWithPriorityObjects(LocalPlayer player) {
         println("We are within the interactWithPriorityObjects method");
-        Area bestIsland = getBestAvailableIsland();
         println(bestIsland);
         if (bestIsland != null && !bestIsland.contains(player.getCoordinate())) {
             println("Moving to the best available island: " + bestIsland);
             moveToIsland(bestIsland);
         }
-        println("Starting interaction with priority objects");
-        Area currentIsland = determineCurrentIsland(player);
-        println("Determined current island: " + (currentIsland != null ? currentIsland.getArea() : "None"));
-        if (bestIsland != null) {
-            List<String> eligibleObjects = getEligibleObjects(player);
-            println("Eligible objects determined: " + eligibleObjects);
-            Execution.delay(RandomGenerator.nextInt(3000, 5000));
-            tryInteractWithNearestObject(currentIsland, eligibleObjects, player);
-        } else {
-            println("Player is not on any known island.");
+        else {
+            println("Starting interaction with priority objects");
+            Area currentIsland = determineCurrentIsland(player);
+            println("Determined current island: " + (currentIsland != null ? currentIsland.getArea() : "None"));
+            if (currentIsland != null) {
+                List<String> eligibleObjects = getEligibleObjects(player);
+                println("Eligible objects determined: " + eligibleObjects);
+                Execution.delay(RandomGenerator.nextInt(3000, 5000));
+                tryInteractWithNearestObject(currentIsland, eligibleObjects, player);
+            } else {
+                println("Player is not on any known island.");
+            }
         }
         return random.nextLong(3000, 7000);
     }
