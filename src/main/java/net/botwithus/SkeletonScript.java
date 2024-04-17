@@ -88,11 +88,11 @@ public class SkeletonScript extends LoopingScript {
             }
             case DIVINATIONDEPOSIT -> {
                 //do deposit stuff
-                Execution.delay(divinationInstance.deposit());
+                Execution.delay(Divination.deposit());
             }
             case DIVINATIONTRAVERSE -> {
                 //do traverse stuff
-                Execution.delay(divinationInstance.moveToColony());
+                Execution.delay(Divination.moveToColony());
             }
 //            case CRAFTINGSKILLING -> {
 //                //do crafting stuff
@@ -126,10 +126,10 @@ public class SkeletonScript extends LoopingScript {
 //                //do banking stuff
 //                Execution.delay(Fishing.MenaBanking());
 //            }
-//            case RUNECRAFTING -> {
-//                //do runecrafting stuff
-//                Execution.delay(RuneCrafting.interactWithPriorityObjects(player));;
-//            }
+            case RUNECRAFTING -> {
+                //do runecrafting stuff
+                Execution.delay(RuneCrafting.interactWithPriorityObjects(player));;
+            }
 //            case COOKINGSKILLING -> {
 //                //do cooking stuff
 //                Execution.delay(Cooking.handleCooking(player));

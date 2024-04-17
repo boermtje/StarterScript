@@ -104,7 +104,7 @@ public class Divination {
         return area.contains(player.getCoordinate());
     }
 
-    public long moveToColony() {
+    public static long moveToColony() {
         if (Movement.traverse(NavPath.resolve(Colonies.get(wispState.name()))) == TraverseEvent.State.FINISHED) {
             SkeletonScript.botState = SkeletonScript.BotState.DIVINATION;
         } else {
@@ -113,7 +113,7 @@ public class Divination {
         return random.nextLong(1000, 1500);
     }
 
-    public long deposit() {
+    public static long deposit() {
         long startTime = System.currentTimeMillis();
         long maxDuration = 180000; // 3 minutes in milliseconds
 
@@ -151,7 +151,7 @@ public class Divination {
         return random.nextLong(1000, 1500);
     }
 
-    private boolean containsMemoryItems() {
+    private static boolean containsMemoryItems() {
         Pattern memoryPattern = Regex.getPatternForContainsString(" memory");
         for (Item item : Backpack.getItems()) {
             if (memoryPattern.matcher(item.getName()).find()) {

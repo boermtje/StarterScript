@@ -22,15 +22,16 @@ import net.botwithus.rs3.util.RandomGenerator;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class RuneCrafting extends SkeletonScript {
-    private Random random = new Random();
-    private HashMap<String, Integer> priorityObjects;
-    private HashMap<String, Integer> priorityNPCs;
-    private HashMap<String, Area> islands;
-    private HashMap<String, Integer> levelRequirements;
+import static net.botwithus.rs3.script.ScriptConsole.println;
 
-    public RuneCrafting(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition) {
-        super(s, scriptConfig, scriptDefinition);
+public class RuneCrafting {
+    private static Random random = new Random();
+    private static HashMap<String, Integer> priorityObjects;
+    private HashMap<String, Integer> priorityNPCs;
+    private static HashMap<String, Area> islands;
+    private static HashMap<String, Integer> levelRequirements;
+
+    public RuneCrafting() {
         initializeMaps(); // Call to initialize maps
     }
 
@@ -103,13 +104,13 @@ public class RuneCrafting extends SkeletonScript {
         levelRequirements.put("Island_High_29", 90);
     }
 
-    private void moveToIsland(Area island) {
+    private static void moveToIsland(Area island) {
         println("Traversing to island: " + island);
         Movement.traverse(NavPath.resolve(island.getCentroid())); // Ensure this method matches how you handle movement
         Execution.delay(3000); // Delay for traversal
     }
 
-    private boolean hasRune_Essence() {
+    private static boolean hasRune_Essence() {
         ResultSet<Item> runeScan = InventoryItemQuery.newQuery(93).ids(24227).results();
         Item rune = runeScan.first();
         if (rune != null) {
@@ -118,7 +119,7 @@ public class RuneCrafting extends SkeletonScript {
         return false;
     }
 
-    public void tryInteractWithNearestObject(Area currentIsland, List<String> eligibleObjects, LocalPlayer player) {
+    public static void tryInteractWithNearestObject(Area currentIsland, List<String> eligibleObjects, LocalPlayer player) {
         println("Attempting to interact with objects in " + currentIsland);
 
         if (!hasRune_Essence()) {
@@ -168,7 +169,7 @@ public class RuneCrafting extends SkeletonScript {
         println("No eligible objects found for interaction in the current island.");
     }
 
-    public long interactWithPriorityObjects(LocalPlayer player) {
+    public static long interactWithPriorityObjects(LocalPlayer player) {
         println("We are within the interactWithPriorityObjects method");
         Area bestIsland = getBestAvailableIsland();
         if (bestIsland != null && !bestIsland.contains(player.getCoordinate())) {
@@ -189,7 +190,7 @@ public class RuneCrafting extends SkeletonScript {
         return random.nextLong(3000, 7000);
     }
 
-    private Area determineCurrentIsland(LocalPlayer player) {
+    private static Area determineCurrentIsland(LocalPlayer player) {
         for (Map.Entry<String, Area> entry : islands.entrySet()) {
             println("Checking island: " + entry.getKey());
             if (entry.getValue().contains(player.getCoordinate())) {
@@ -201,7 +202,7 @@ public class RuneCrafting extends SkeletonScript {
         return null;
     }
 
-    private List<String> getEligibleObjects(LocalPlayer player) {
+    private static List<String> getEligibleObjects(LocalPlayer player) {
         int playerLevel = Skills.RUNECRAFTING.getLevel();
         List<String> eligibleObjects = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : priorityObjects.entrySet()) {
@@ -222,7 +223,7 @@ public class RuneCrafting extends SkeletonScript {
                 .collect(Collectors.toList());
     }
 
-    private Area getBestAvailableIsland() {
+    private static Area getBestAvailableIsland() {
         int playerLevel = Skills.RUNECRAFTING.getLevel();
         Area bestIsland = null;
         int highestAccessibleLevel = 0;
@@ -235,69 +236,5 @@ public class RuneCrafting extends SkeletonScript {
         }
 
         return bestIsland;
-    }
-
-    /////////////////STATISTICS////////////////////
-    //XP Gain & Level Gain base is set to zero,
-    private int xpGained = 0;
-    private int levelsGained = 0;
-    private long startTime;
-    private int xpPerHour;
-    private String ttl; // Time to level
-
-    //XP Gain & Level Gain is calculated and added to base
-    @Override
-    public boolean initialize() {
-        startTime = System.currentTimeMillis();
-        xpGained = 0;
-        levelsGained = 0;
-
-        subscribe(SkillUpdateEvent.class, skillUpdateEvent -> {
-            if (skillUpdateEvent.getId() == Skills.RUNECRAFTING.getId()) {
-                xpGained += (skillUpdateEvent.getExperience() - skillUpdateEvent.getOldExperience());
-                if (skillUpdateEvent.getOldActualLevel() < skillUpdateEvent.getActualLevel()) {
-                    levelsGained++;
-                }
-            }
-        });
-
-        return super.initialize();
-    }
-
-    public String levelsGained() {
-        return levelsGained + " Levels";
-    }
-
-    public String xpPerHour() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime > startTime) {
-            xpPerHour = (int) (xpGained * 3600000.0 / (currentTime - startTime));
-        }
-        return xpPerHour + " XP/hr";
-    }
-
-    public String ttl() {
-        if (xpPerHour > 0) {
-            int xpToNextLevel = Skills.RUNECRAFTING.getExperienceToNextLevel();
-            int totalSeconds = (int) (xpToNextLevel * 3600.0 / xpPerHour);
-            int hours = totalSeconds / 3600;
-            int minutes = (totalSeconds % 3600) / 60;
-            int seconds = totalSeconds % 60;
-            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-        }
-        return "N/A";
-    }
-
-    public String timePassed() {
-        long currentTime = System.currentTimeMillis();
-        long elapsedMillis = currentTime - startTime;
-        long hours = elapsedMillis / 3600000;
-        long minutes = (elapsedMillis % 3600000) / 60000;
-        long seconds = (elapsedMillis % 60000) / 1000;
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
-
-    public String xpGained() {
-        return xpGained + " XP";
     }
 }
