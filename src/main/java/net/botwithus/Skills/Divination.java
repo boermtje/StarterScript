@@ -2,13 +2,9 @@ package net.botwithus.Skills;
 
 import net.botwithus.SkeletonScript;
 import net.botwithus.SkeletonScriptGraphicsContext;
-import net.botwithus.internal.scripts.ScriptDefinition;
 import net.botwithus.rs3.events.impl.SkillUpdateEvent;
 import net.botwithus.rs3.game.skills.Skills;
-import net.botwithus.rs3.script.config.ScriptConfig;
 import net.botwithus.api.game.hud.inventories.Backpack;
-import net.botwithus.rs3.events.impl.ChatMessageEvent;
-import net.botwithus.rs3.game.Client;
 import net.botwithus.rs3.game.movement.Movement;
 import net.botwithus.rs3.game.movement.NavPath;
 import net.botwithus.rs3.game.movement.TraverseEvent;
@@ -29,13 +25,12 @@ import java.util.regex.Pattern;
 
 import static net.botwithus.rs3.script.ScriptConsole.println;
 
-public class Divination extends SkeletonScript {
-    private static Divination instance;
+public class Divination {
+//    private static Divination instance = null;
     public static WispType wispState = WispType.Pale;
     private boolean someBool = true;
     private Random random = new Random();
     public static int currentDivinationLevel;
-    private SkeletonScriptGraphicsContext GraphicsContext;
     public HashMap<String, Area> Colonies;
     private SkeletonScript script;
 
@@ -62,35 +57,27 @@ public class Divination extends SkeletonScript {
         Luminous,
         Incandescent,
     }
-    public Divination(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition, SkeletonScriptGraphicsContext graphicsContext) {
-        super(s, scriptConfig, scriptDefinition);
-        GraphicsContext = graphicsContext;
+
+    public Divination() {
         initializeMaps(); // Call to initialize maps
         initializeLevels(); // Call to initialize levels
-        subscribeToSkillUpdates(); // Call to subscribe to skill updates
+//        subscribeToSkillUpdates(); // Call to subscribe to skill updates
     }
 
-    public static Divination getInstance(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition, SkeletonScriptGraphicsContext graphicsContext) {
-        if (instance == null) {
-            instance = new Divination(s, scriptConfig, scriptDefinition, graphicsContext);
-        }
-        return instance;
-    }
-
-    private void subscribeToSkillUpdates() {
-        // Subscribe to the SkillUpdateEvent for Divination skill
-        script.subscribe(SkillUpdateEvent.class, skillUpdateEvent -> {
-            if (skillUpdateEvent.getId() == Skills.DIVINATION.getId()) {
-                // Update the current Divination level
-                currentDivinationLevel = skillUpdateEvent.getActualLevel();
-                // If the progressive mode is enabled and the level has increased,
-                // update the wisp type based on the new level.
-                if (GraphicsContext.progressiveModeEnabled) {
-                    checkAndUpdateWisp(currentDivinationLevel);
-                }
-            }
-        });
-    }
+//    private void subscribeToSkillUpdates() {
+//        // Subscribe to the SkillUpdateEvent for Divination skill
+//        script.subscribe(SkillUpdateEvent.class, skillUpdateEvent -> {
+//            if (skillUpdateEvent.getId() == Skills.DIVINATION.getId()) {
+//                // Update the current Divination level
+//                currentDivinationLevel = skillUpdateEvent.getActualLevel();
+//                // If the progressive mode is enabled and the level has increased,
+//                // update the wisp type based on the new level.
+//                if (graphicsContext.progressiveModeEnabled) {
+//                    checkAndUpdateWisp(currentDivinationLevel);
+//                }
+//            }
+//        });
+//    }
 
     private void initializeLevels (){
         // Initialize the wisp level map

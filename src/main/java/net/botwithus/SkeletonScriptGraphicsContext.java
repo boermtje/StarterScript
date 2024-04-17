@@ -13,9 +13,7 @@ import java.util.*;
 
 public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     private SkeletonScript script;
-    private NativeInteger selectedItem;
-    //    private Divination divinationSkill;
-    public boolean progressiveModeEnabled = false;
+    public boolean progressiveModeEnabled = true;
     private Map<String, SkeletonScript.BotState> botStateMap;
     public Queue<BotQueueItem> botStateQueue = new LinkedList<>();
     public void removeTask(SkeletonScript.BotState stateToRemove) {
@@ -143,26 +141,25 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     }
                     ImGui.Text("Current Wisp Type: " + (Divination.getwispState()));
 
-                    if (ImGui.Checkbox("Enable Progressive Mode", progressiveModeEnabled)) {
-                        progressiveModeEnabled = !progressiveModeEnabled;
+                    if (ImGui.Checkbox("Enable Progressive Mode", progressiveModeEnabled));{
                         // If progressive mode just got enabled, automatically set the highest available wisp type
                         if (progressiveModeEnabled) {
                             int currentLevel = Divination.currentDivinationLevel;
                             Divination.WispType highestAvailableWisp = Divination.getHighestAvailableWisp(currentLevel);
                             Divination.setWispType(highestAvailableWisp);
-                        }
-                        script.saveConfiguration(); // Save the new selection
-                    }
-
-                    if (!progressiveModeEnabled) {
-                        String[] wispTypes = Arrays.stream(Divination.WispType.values())
-                                .map(Enum::name)
-                                .toArray(String[]::new);
-                        NativeInteger selectedWisp = new NativeInteger(Divination.getCurrentWispType().ordinal());
-                        if (ImGui.Combo("Wisp Type", selectedWisp, wispTypes)) {
-                            Divination.WispType newWispType = Divination.WispType.values()[selectedWisp.get()];
-                            Divination.setWispType(newWispType);
                             script.saveConfiguration(); // Save the new selection
+                        }
+
+                        if (!progressiveModeEnabled) {
+                            String[] wispTypes = Arrays.stream(Divination.WispType.values())
+                                    .map(Enum::name)
+                                    .toArray(String[]::new);
+                            NativeInteger selectedWisp = new NativeInteger(Divination.getCurrentWispType().ordinal());
+                            if (ImGui.Combo("Wisp Type", selectedWisp, wispTypes)) {
+                                Divination.WispType newWispType = Divination.WispType.values()[selectedWisp.get()];
+                                Divination.setWispType(newWispType);
+                                script.saveConfiguration(); // Save the new selection
+                            }
                         }
                     }
                     ImGui.EndTabItem();

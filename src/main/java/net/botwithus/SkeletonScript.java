@@ -2,6 +2,7 @@ package net.botwithus;
 
 import net.botwithus.Skills.*;
 import net.botwithus.internal.scripts.ScriptDefinition;
+import net.botwithus.rs3.events.impl.SkillUpdateEvent;
 import net.botwithus.rs3.game.Client;
 import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
 import net.botwithus.rs3.game.skills.Skills;
@@ -12,8 +13,10 @@ import net.botwithus.rs3.script.config.ScriptConfig;
 
 import java.util.*;
 
+import static net.botwithus.Skills.Divination.currentDivinationLevel;
+
 public class SkeletonScript extends LoopingScript {
-    private Divination divinationInstance;
+    private final Divination divinationInstance;
     public BotState botState = BotState.IDLE;
     private Random random = new Random();
     private SkeletonScriptGraphicsContext GraphicsContext;
@@ -45,8 +48,24 @@ public class SkeletonScript extends LoopingScript {
         this.sgc = new SkeletonScriptGraphicsContext(getConsole(), this);
         loadConfiguration(); // Load configuration when the script starts
         GraphicsContext = (SkeletonScriptGraphicsContext) sgc;
-        this.divinationInstance = new Divination(s, scriptConfig, scriptDefinition, (SkeletonScriptGraphicsContext) this.sgc);
-}
+        this.divinationInstance = new Divination();
+        subscribeToSkillUpdates();
+    }
+
+        private void subscribeToSkillUpdates() {
+        // Subscribe to the SkillUpdateEvent for Divination skill
+        subscribe(SkillUpdateEvent.class, skillUpdateEvent -> {
+            if (skillUpdateEvent.getId() == Skills.DIVINATION.getId()) {
+                // Update the current Divination level
+                currentDivinationLevel = skillUpdateEvent.getActualLevel();
+                // If the progressive mode is enabled and the level has increased,
+                // update the wisp type based on the new level.
+                if (GraphicsContext.progressiveModeEnabled) {
+                    divinationInstance.checkAndUpdateWisp(currentDivinationLevel);
+                }
+            }
+        });
+    }
 
     @Override
     public void onLoop() {
@@ -68,6 +87,7 @@ public class SkeletonScript extends LoopingScript {
             }
             case DIVINATION -> {
                 //do questing stuff
+                println("We're doing divination!");
                 Execution.delay(divinationInstance.handleSkilling(player, Divination.wispState.name()));
             }
             case DIVINATIONDEPOSIT -> {

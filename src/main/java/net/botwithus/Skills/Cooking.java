@@ -2,11 +2,9 @@ package net.botwithus.Skills;
 
 import net.botwithus.SkeletonScript;
 import net.botwithus.SkeletonScriptGraphicsContext;
-import net.botwithus.api.game.hud.inventories.Backpack;
 import net.botwithus.api.game.hud.inventories.Bank;
 import net.botwithus.internal.scripts.ScriptDefinition;
 import net.botwithus.rs3.game.Area;
-import net.botwithus.rs3.game.Client;
 import net.botwithus.rs3.game.Coordinate;
 import net.botwithus.rs3.game.hud.interfaces.Interfaces;
 import net.botwithus.rs3.game.minimenu.MiniMenu;
