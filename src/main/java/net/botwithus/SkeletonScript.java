@@ -17,6 +17,7 @@ import static net.botwithus.Skills.Divination.currentDivinationLevel;
 
 public class SkeletonScript extends LoopingScript {
     private final Divination divinationInstance;
+    private final RuneCrafting runeCraftingInstance;
     public static BotState botState = BotState.IDLE;
     private Random random = new Random();
     private SkeletonScriptGraphicsContext GraphicsContext;
@@ -36,7 +37,8 @@ public class SkeletonScript extends LoopingScript {
         FISHINGTRAVERSE,
         FISHINGMENAPHOS,
         FISHINGMENABANKING,
-        RUNECRAFTING,
+        RUNECRAFTINGSKILLING,
+//        RUNECRAFTINGTRAVERSE,
         COOKINGSKILLING,
         COOKINGTRAVERSE,
         COOKINGBANKING
@@ -49,6 +51,7 @@ public class SkeletonScript extends LoopingScript {
         loadConfiguration(); // Load configuration when the script starts
         GraphicsContext = (SkeletonScriptGraphicsContext) sgc;
         this.divinationInstance = new Divination();
+        this.runeCraftingInstance = new RuneCrafting();
     }
 
     private void subscribeToSkillUpdates() {
@@ -79,7 +82,7 @@ public class SkeletonScript extends LoopingScript {
                 Execution.delay(random.nextLong(1000, 3000));
             }
             case DIVINATION -> {
-                //do questing stuff
+                //do divination stuff
                 Execution.delay(Divination.handleSkilling(player, Divination.wispState.name()));
                 if (GraphicsContext.progressiveModeEnabled) {
                     subscribeToSkillUpdates();
@@ -125,10 +128,14 @@ public class SkeletonScript extends LoopingScript {
 //                //do banking stuff
 //                Execution.delay(Fishing.MenaBanking());
 //            }
-            case RUNECRAFTING -> {
+            case RUNECRAFTINGSKILLING -> {
                 //do runecrafting stuff
                 Execution.delay(RuneCrafting.interactWithPriorityObjects(player));;
             }
+//            case RUNECRAFTINGTRAVERSE -> {
+//                //do traverse stuff
+//                Execution.delay(RuneCrafting.mo());
+//            }
 //            case COOKINGSKILLING -> {
 //                //do cooking stuff
 //                Execution.delay(Cooking.handleCooking(player));

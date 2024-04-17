@@ -4,6 +4,7 @@ import net.botwithus.SkeletonScript;
 import net.botwithus.internal.scripts.ScriptDefinition;
 import net.botwithus.rs3.game.movement.Movement;
 import net.botwithus.rs3.game.movement.NavPath;
+import net.botwithus.rs3.game.movement.TraverseEvent;
 import net.botwithus.rs3.script.config.ScriptConfig;
 import net.botwithus.rs3.game.queries.builders.characters.NpcQuery;
 import net.botwithus.rs3.game.queries.builders.items.InventoryItemQuery;
@@ -106,8 +107,9 @@ public class RuneCrafting {
 
     private static void moveToIsland(Area island) {
         println("Traversing to island: " + island);
-        Movement.traverse(NavPath.resolve(island.getCentroid())); // Ensure this method matches how you handle movement
-        Execution.delay(3000); // Delay for traversal
+        if (Movement.traverse(NavPath.resolve(island)) == TraverseEvent.State.FINISHED) {
+            Execution.delay(random.nextInt(100,500));
+        }
     }
 
     private static boolean hasRune_Essence() {
