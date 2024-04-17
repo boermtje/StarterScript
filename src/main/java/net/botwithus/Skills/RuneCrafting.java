@@ -172,6 +172,7 @@ public class RuneCrafting {
     public static long interactWithPriorityObjects(LocalPlayer player) {
         println("We are within the interactWithPriorityObjects method");
         Area bestIsland = getBestAvailableIsland();
+        println(bestIsland);
         if (bestIsland != null && !bestIsland.contains(player.getCoordinate())) {
             println("Moving to the best available island: " + bestIsland);
             moveToIsland(bestIsland);
@@ -224,9 +225,11 @@ public class RuneCrafting {
     }
 
     private static Area getBestAvailableIsland() {
+        println("Searching for best island");
         int playerLevel = Skills.RUNECRAFTING.getLevel();
         Area bestIsland = null;
         int highestAccessibleLevel = 0;
+        println("We are past this point");
 
         for (Map.Entry<String, Integer> entry : levelRequirements.entrySet()) {
             if (playerLevel >= entry.getValue() && entry.getValue() > highestAccessibleLevel) {
@@ -234,7 +237,6 @@ public class RuneCrafting {
                 highestAccessibleLevel = entry.getValue();
             }
         }
-
         return bestIsland;
     }
 }

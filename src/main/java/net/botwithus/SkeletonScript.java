@@ -70,7 +70,6 @@ public class SkeletonScript extends LoopingScript {
             return;
         }
         Execution.delay(random.nextLong(500, 1000));
-        Execution.delay(random.nextLong(500, 1000));
         processQueueItems();
         Execution.delay(random.nextLong(500, 1000));
 

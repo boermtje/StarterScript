@@ -8,14 +8,12 @@ import net.botwithus.rs3.imgui.NativeInteger;
 import net.botwithus.rs3.script.ScriptConsole;
 import net.botwithus.rs3.script.ScriptGraphicsContext;
 
-
 import java.util.*;
-
-import static net.botwithus.rs3.script.ScriptConsole.println;
 
 public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
     private SkeletonScript script;
     public boolean progressiveModeEnabled = true;
+    NativeInteger tempSelectedState = new NativeInteger(0);
     private Map<String, SkeletonScript.BotState> botStateMap;
     public Queue<BotQueueItem> botStateQueue = new LinkedList<>();
     public void removeTask(SkeletonScript.BotState stateToRemove) {
@@ -59,6 +57,8 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         // Initialize states with default values for demonstration
         botStateMap.put("RuneCrafting", SkeletonScript.BotState.RUNECRAFTING);
         botStateMap.put("Divination", SkeletonScript.BotState.DIVINATION);
+
+        botStateQueue.add(new BotQueueItem(SkeletonScript.BotState.RUNECRAFTING, 99, Skills.RUNECRAFTING));
     }
 
     @Override
@@ -75,7 +75,6 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                     String[] botStateNames = botStateMap.keySet().toArray(new String[0]);
 
                     // Temporary state for new queue item to be added
-                    NativeInteger tempSelectedState = new NativeInteger(0);
                     levelInputText = ImGui.InputText("Level", levelInputText);
 
                     // Render combo box and level input only if there's at least one state to select
