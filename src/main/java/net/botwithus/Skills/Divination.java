@@ -1,9 +1,6 @@
 package net.botwithus.Skills;
 
 import net.botwithus.SkeletonScript;
-import net.botwithus.SkeletonScriptGraphicsContext;
-import net.botwithus.rs3.events.impl.SkillUpdateEvent;
-import net.botwithus.rs3.game.skills.Skills;
 import net.botwithus.api.game.hud.inventories.Backpack;
 import net.botwithus.rs3.game.movement.Movement;
 import net.botwithus.rs3.game.movement.NavPath;
@@ -13,34 +10,28 @@ import net.botwithus.rs3.game.queries.builders.objects.SceneObjectQuery;
 import net.botwithus.rs3.game.scene.entities.characters.npc.Npc;
 import net.botwithus.rs3.game.scene.entities.characters.player.LocalPlayer;
 import net.botwithus.rs3.game.scene.entities.object.SceneObject;
-import net.botwithus.rs3.imgui.ImGui;
-import net.botwithus.rs3.imgui.NativeInteger;
 import net.botwithus.rs3.script.Execution;
 import net.botwithus.rs3.game.*;
 import net.botwithus.rs3.util.Regex;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.NavigableMap;
+import java.util.Random;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-import static net.botwithus.SkeletonScriptGraphicsContext.progressiveModeEnabled;
 import static net.botwithus.rs3.script.ScriptConsole.println;
 
 public class Divination {
-//    private static Divination instance = null;
     public static WispType wispState = WispType.Pale;
-    private boolean someBool = true;
     private Random random = new Random();
     public static int currentDivinationLevel;
     public HashMap<String, Area> Colonies;
-    private SkeletonScript script;
 
     public static WispType getCurrentWispType() {
         return wispState;
     }
-    public void setCurrentWispType(WispType wispType) {
-        this.wispState = wispType;
-    }
-    private static final NavigableMap<Integer, WispType> levelToWispMap = new TreeMap<>();
+    public static final NavigableMap<Integer, WispType> levelToWispMap = new TreeMap<>();
 
     public enum WispType {
         Pale,
@@ -61,44 +52,6 @@ public class Divination {
     public Divination() {
         initializeMaps(); // Call to initialize maps
         initializeLevels(); // Call to initialize levels
-//        subscribeToSkillUpdates(); // Call to subscribe to skill updates
-    }
-
-//    private void subscribeToSkillUpdates() {
-//        // Subscribe to the SkillUpdateEvent for Divination skill
-//        script.subscribe(SkillUpdateEvent.class, skillUpdateEvent -> {
-//            if (skillUpdateEvent.getId() == Skills.DIVINATION.getId()) {
-//                // Update the current Divination level
-//                currentDivinationLevel = skillUpdateEvent.getActualLevel();
-//                // If the progressive mode is enabled and the level has increased,
-//                // update the wisp type based on the new level.
-//                if (graphicsContext.progressiveModeEnabled) {
-//                    checkAndUpdateWisp(currentDivinationLevel);
-//                }
-//            }
-//        });
-//    }
-
-    private void ProgressiveMode() {
-        if (progressiveModeEnabled) {
-            int currentLevel = Divination.currentDivinationLevel;
-            Divination.WispType highestAvailableWisp = Divination.getHighestAvailableWisp(currentLevel);
-            Divination.setWispType(highestAvailableWisp);
-            println("Progressive mode enabled");
-            script.saveConfiguration(); // Save the new selection
-        }
-
-        if (!progressiveModeEnabled) {
-            String[] wispTypes = Arrays.stream(Divination.WispType.values())
-                    .map(Enum::name)
-                    .toArray(String[]::new);
-            NativeInteger selectedWisp = new NativeInteger(Divination.getCurrentWispType().ordinal());
-            if (ImGui.Combo("Wisp Type", selectedWisp, wispTypes)) {
-                Divination.WispType newWispType = Divination.WispType.values()[selectedWisp.get()];
-                Divination.setWispType(newWispType);
-                script.saveConfiguration(); // Save the new selection
-            }
-        }
     }
 
     private void initializeLevels (){
@@ -151,17 +104,9 @@ public class Divination {
         return area.contains(player.getCoordinate());
     }
 
-    public static WispType getHighestAvailableWisp(int currentLevel) {
-        return levelToWispMap.floorEntry(currentLevel).getValue();
-    }
-
-    public void checkAndUpdateWisp(int currentLevel) {
-        setCurrentWispType(getHighestAvailableWisp(currentLevel));
-    }
-
     public long moveToColony() {
         if (Movement.traverse(NavPath.resolve(Colonies.get(wispState.name()))) == TraverseEvent.State.FINISHED) {
-            script.botState = SkeletonScript.BotState.DIVINATION;
+            SkeletonScript.botState = SkeletonScript.BotState.DIVINATION;
         } else {
             println("Failed to traverse to colony");
         }
@@ -197,9 +142,9 @@ public class Divination {
 
         if (containsMemoryItems()) {
             println("Backpack is still full");
-            script.botState = SkeletonScript.BotState.DIVINATIONDEPOSIT;
+            SkeletonScript.botState = SkeletonScript.BotState.DIVINATIONDEPOSIT;
         } else {
-            script.botState = SkeletonScript.BotState.DIVINATION;
+            SkeletonScript.botState = SkeletonScript.BotState.DIVINATION;
             println("Backpack is empty");
         }
 
@@ -220,7 +165,7 @@ public class Divination {
         Area area = Colonies.get(wispState.name());
         if (!isInArea(area, player)) {
             System.out.println("Change state to traverse");
-            script.botState = SkeletonScript.BotState.DIVINATIONTRAVERSE;
+            SkeletonScript.botState = SkeletonScript.BotState.DIVINATIONTRAVERSE;
             return random.nextLong(500, 800);
         }
 
@@ -232,7 +177,7 @@ public class Divination {
         }
 
         if (Backpack.isFull()) {
-            script.botState = SkeletonScript.BotState.DIVINATIONDEPOSIT;
+            SkeletonScript.botState = SkeletonScript.BotState.DIVINATIONDEPOSIT;
         }
 
         else if (player.getAnimationId() == -1) {
@@ -265,13 +210,5 @@ public class Divination {
 
     public static void setWispType(WispType wispType) {
         wispState = wispType;
-    }
-
-    public boolean isSomeBool() {
-        return someBool;
-    }
-
-    public void setSomeBool(boolean someBool) {
-        this.someBool = someBool;
     }
 }

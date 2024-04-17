@@ -17,7 +17,7 @@ import static net.botwithus.Skills.Divination.currentDivinationLevel;
 
 public class SkeletonScript extends LoopingScript {
     private final Divination divinationInstance;
-    public BotState botState = BotState.IDLE;
+    public static BotState botState = BotState.IDLE;
     private Random random = new Random();
     private SkeletonScriptGraphicsContext GraphicsContext;
 
@@ -49,22 +49,13 @@ public class SkeletonScript extends LoopingScript {
         loadConfiguration(); // Load configuration when the script starts
         GraphicsContext = (SkeletonScriptGraphicsContext) sgc;
         this.divinationInstance = new Divination();
-        subscribeToSkillUpdates();
     }
 
         private void subscribeToSkillUpdates() {
-        // Subscribe to the SkillUpdateEvent for Divination skill
-        subscribe(SkillUpdateEvent.class, skillUpdateEvent -> {
-            if (skillUpdateEvent.getId() == Skills.DIVINATION.getId()) {
-                // Update the current Divination level
-                currentDivinationLevel = skillUpdateEvent.getActualLevel();
-                // If the progressive mode is enabled and the level has increased,
-                // update the wisp type based on the new level.
-                if (GraphicsContext.progressiveModeEnabled) {
-                    divinationInstance.checkAndUpdateWisp(currentDivinationLevel);
-                }
-            }
-        });
+        Skills.DIVINATION.getActualLevel();
+        //Use levelToWispMap to get the wisp type for the current level
+        Divination.WispType wispType = Divination.levelToWispMap.floorEntry(currentDivinationLevel).getValue();
+        Divination.setWispType(wispType);
     }
 
     @Override
@@ -79,6 +70,9 @@ public class SkeletonScript extends LoopingScript {
         Execution.delay(random.nextLong(500, 1000));
         processQueueItems();
         Execution.delay(random.nextLong(500, 1000));
+
+//        println("Update Best Wisp");
+//        subscribeToSkillUpdates();
 
         switch (botState) {
             case IDLE -> {
@@ -206,7 +200,7 @@ public class SkeletonScript extends LoopingScript {
         }
     }
 
-    public void saveConfiguration() {
+    void saveConfiguration() {
         try {
             // Save the selected WispType using its name
             configuration.addProperty("selectedWispType", Divination.getCurrentWispType().name());
