@@ -178,12 +178,11 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         }
     }
 
-    public int getCurrentSkillLevel() {
+    public int getCurrentSkillLevel(Skills skill) {
         if (!botStateQueue.isEmpty()) {
             BotQueueItem currentItem = botStateQueue.peek(); // Get the current item from the queue
-            Skills currentSkill = mapStateToSkill(currentItem.state); // Map the state to a skill
-            if (currentSkill != null) {
-                return currentSkill.getActualLevel();  // Retrieve the actual level for this skill
+            if (skill != null) {
+                return skill.getActualLevel();  // Retrieve the actual level for this skill
             } else {
                 System.err.println("Skill mapping returned null for state: " + currentItem.state);
                 return -1; // Error handling, adjust as necessary

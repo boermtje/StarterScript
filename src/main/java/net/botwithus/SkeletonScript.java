@@ -172,7 +172,7 @@ public class SkeletonScript extends LoopingScript {
                 continue;
             }
 
-            int currentSkillLevel = GraphicsContext.getCurrentSkillLevel(); // Get current skill level for this skill
+            int currentSkillLevel = GraphicsContext.getCurrentSkillLevel(skill); // Get current skill level for this skill
             println("Current skill level for " + skill + ": " + currentSkillLevel + ", target: " + item.targetLevel);
 
             if (currentSkillLevel > item.targetLevel) {
