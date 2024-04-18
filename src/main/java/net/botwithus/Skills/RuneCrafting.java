@@ -1,5 +1,6 @@
 package net.botwithus.Skills;
 
+import net.botwithus.SkeletonScript;
 import net.botwithus.rs3.game.movement.Movement;
 import net.botwithus.rs3.game.movement.NavPath;
 import net.botwithus.rs3.game.movement.TraverseEvent;
@@ -27,7 +28,7 @@ public class RuneCrafting {
     private HashMap<String, Integer> priorityNPCs;
     private static HashMap<String, Area> islands;
     private static HashMap<String, Integer> levelRequirements;
-    private static Area bestIsland = getBestAvailableIsland();
+//    private static Area bestIsland = getBestAvailableIsland();
 
     public RuneCrafting() {
         initializeMaps(); // Call to initialize maps
@@ -69,15 +70,15 @@ public class RuneCrafting {
         priorityNPCs.put("Soul esshound", 90);
 
         islands = new HashMap<>();
-        Area.Rectangular Island_1 = new Area.Rectangular(new Coordinate(3989, 6095, 1), new Coordinate(4007, 6119, 1));
+        Area.Rectangular Island_1 = new Area.Rectangular(new Coordinate(3989, 6095, 0), new Coordinate(4007, 6119, 1));
         islands.put("Island_Low_1", Island_1);
-        Area.Rectangular Island_16 = new Area.Rectangular(new Coordinate(3990, 6067, 1), new Coordinate(4014, 6041, 1));
+        Area.Rectangular Island_16 = new Area.Rectangular(new Coordinate(3990, 6067, 0), new Coordinate(4014, 6041, 1));
         islands.put("Island_Low_16", Island_16);
-        Area.Rectangular Island_5 = new Area.Rectangular(new Coordinate(4125, 6093, 1), new Coordinate(4146, 6068, 1));
+        Area.Rectangular Island_5 = new Area.Rectangular(new Coordinate(4125, 6093, 0), new Coordinate(4146, 6068, 1));
         islands.put("Island_Mid__5", Island_5);
-        Area.Rectangular Island_23 = new Area.Rectangular(new Coordinate(4191, 6108, 1), new Coordinate(4204, 6085, 1));
+        Area.Rectangular Island_23 = new Area.Rectangular(new Coordinate(4191, 6108, 0), new Coordinate(4204, 6085, 1));
         islands.put("Island_Mid_23", Island_23);
-        Area.Rectangular Island_13 = new Area.Rectangular(new Coordinate(4325, 6055, 1), new Coordinate(4365, 6037, 1));
+        Area.Rectangular Island_13 = new Area.Rectangular(new Coordinate(4325, 6055, 0), new Coordinate(4365, 6037, 1));
         islands.put("Island_High_13", Island_13);
         Area.Polygonal Island_20 = new Area.Polygonal(
                 new Coordinate(4314, 6096, 1),
@@ -103,10 +104,14 @@ public class RuneCrafting {
     }
 
     public static long moveToIsland() {
+        Area bestIsland = getBestAvailableIsland();
         println("Traversing to island: " + bestIsland);
         if (Movement.traverse(NavPath.resolve(bestIsland)) == TraverseEvent.State.FINISHED) {
             println("Done");
             Execution.delay(random.nextInt(100,500));
+        }
+        else {
+            println("Failed to traverse to island");
         }
         return random.nextInt(100,500);
     }
@@ -172,10 +177,10 @@ public class RuneCrafting {
 
     public static long interactWithPriorityObjects(LocalPlayer player) {
         println("We are within the interactWithPriorityObjects method");
-        println(bestIsland);
+        Area bestIsland = getBestAvailableIsland();
         if (bestIsland != null && !bestIsland.contains(player.getCoordinate())) {
             println("Moving to the best available island: " + bestIsland);
-            moveToIsland(bestIsland);
+            SkeletonScript.botState = SkeletonScript.BotState.RUNECRAFTINGTRAVERSE;
         }
         else {
             println("Starting interaction with priority objects");
