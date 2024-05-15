@@ -18,6 +18,7 @@ import static net.botwithus.Skills.Divination.currentDivinationLevel;
 public class SkeletonScript extends LoopingScript {
     private final Divination divinationInstance;
     private final RuneCrafting runeCraftingInstance;
+    private final Cooking cookingInstance;
     public static BotState botState = BotState.IDLE;
     private Random random = new Random();
     private SkeletonScriptGraphicsContext GraphicsContext;
@@ -39,7 +40,7 @@ public class SkeletonScript extends LoopingScript {
         FISHINGMENABANKING,
         RUNECRAFTING,
         RUNECRAFTINGTRAVERSE,
-        COOKINGSKILLING,
+        COOKING,
         COOKINGTRAVERSE,
         COOKINGBANKING
         //...
@@ -52,6 +53,7 @@ public class SkeletonScript extends LoopingScript {
         GraphicsContext = (SkeletonScriptGraphicsContext) sgc;
         this.divinationInstance = new Divination();
         this.runeCraftingInstance = new RuneCrafting();
+        this.cookingInstance = new Cooking();
     }
 
     private void subscribeToSkillUpdates() {
@@ -136,18 +138,18 @@ public class SkeletonScript extends LoopingScript {
                 //do traverse stuff
                 Execution.delay(RuneCrafting.moveToIsland());
             }
-//            case COOKINGSKILLING -> {
-//                //do cooking stuff
-//                Execution.delay(Cooking.handleCooking(player));
-//            }
-//            case COOKINGTRAVERSE -> {
-//                //do traverse stuff
-//                Execution.delay(Cooking.Traverse());
-//            }
-//            case COOKINGBANKING -> {
-//                //do banking stuff
-//                Execution.delay(Cooking.handleBanking());
-//            }
+            case COOKING -> {
+                //do cooking stuff
+                Execution.delay(Cooking.handleCooking(player));
+            }
+            case COOKINGTRAVERSE -> {
+                //do traverse stuff
+                Execution.delay(Cooking.Traverse());
+            }
+            case COOKINGBANKING -> {
+                //do banking stuff
+                Execution.delay(Cooking.handleBanking());
+            }
         }
     }
 
@@ -178,6 +180,9 @@ public class SkeletonScript extends LoopingScript {
             if (currentSkillLevel > item.targetLevel) {
                 println("Removing " + item.state + " from queue because current level " + currentSkillLevel + " is greater than target " + item.targetLevel);
                 iterator.remove(); // Correctly remove using iterator
+                SkeletonScriptGraphicsContext.BotQueueItem currentItem = GraphicsContext.botStateQueue.peek();
+                setBotState(currentItem.state);
+                //Add Bank Deposit here
             }
         }
         println("Finished processing queue items.");

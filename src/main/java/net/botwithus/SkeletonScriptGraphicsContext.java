@@ -41,6 +41,8 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
                 return Skills.DIVINATION;
             case RUNECRAFTING:
                 return Skills.RUNECRAFTING;
+            case COOKING:
+                return Skills.COOKING;
         }
         return null;
     }
@@ -57,8 +59,8 @@ public class SkeletonScriptGraphicsContext extends ScriptGraphicsContext {
         // Initialize states with default values for demonstration
         botStateMap.put("RuneCrafting", SkeletonScript.BotState.RUNECRAFTING);
         botStateMap.put("Divination", SkeletonScript.BotState.DIVINATION);
+        botStateMap.put("Cooking", SkeletonScript.BotState.COOKING);
 
-        botStateQueue.add(new BotQueueItem(SkeletonScript.BotState.RUNECRAFTING, 99, Skills.RUNECRAFTING));
     }
 
     @Override

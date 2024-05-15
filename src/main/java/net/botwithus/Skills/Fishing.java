@@ -21,27 +21,22 @@ import net.botwithus.rs3.game.Coordinate;
 
 import java.util.*;
 
-public class Fishing extends SkeletonScript {
+import static net.botwithus.rs3.script.ScriptConsole.print;
+import static net.botwithus.rs3.script.ScriptConsole.println;
+
+public class Fishing {
     public int fishGained = 0;
     private boolean isSkilling = false;
     private Random random = new Random();
 
-    public Fishing(String s, ScriptConfig scriptConfig, ScriptDefinition scriptDefinition) {
-        super(s, scriptConfig, scriptDefinition);
-        //Subscribe to InventoryUpdateEvent
-        subscribe(InventoryUpdateEvent.class, inventoryUpdateEvent -> {
-            if (isSkilling) {
-                Item item = inventoryUpdateEvent.getNewItem();
-                fishGained++;
-            }
-        });
+    public Fishing() {
     }
 
         public long Menaphos(LocalPlayer player){
             Npc fishing = NpcQuery.newQuery().name("Fishing spot").results().nearest();
             if (Backpack.isFull()) {
                 println("Inventory is full.");
-                botState = BotState.FISHINGMENABANKING;
+                SkeletonScript.botState = SkeletonScript.BotState.FISHINGMENABANKING;
                 return random.nextLong(250, 1500);
             }
             if (fishing != null && player.getAnimationId() == -1 && !player.isMoving()) {
@@ -58,7 +53,7 @@ public class Fishing extends SkeletonScript {
             Execution.delay(random.nextLong(1000, 3000));
             Bank.interact("Load Last Preset from");
             Execution.delay(random.nextLong(1000, 3000));
-            botState = BotState.FISHINGMENAPHOS;
+            SkeletonScript.botState = SkeletonScript.BotState.FISHINGMENAPHOS;
             return random.nextLong(1500, 3000);
         }
 
@@ -75,14 +70,14 @@ public class Fishing extends SkeletonScript {
             if (Backpack.isFull()) {
                 println("Inventory is full.");
                 isSkilling = false;  // Stop skilling
-                botState = BotState.FISHINGBANKING;
+                SkeletonScript.botState = SkeletonScript.BotState.FISHINGBANKING;
                 return random.nextLong(250, 1500);
             }
             if (Bank.isOpen()) {
                 Bank.close();
             } else if (fishing != null && player.getAnimationId() == -1 && !player.isMoving()) {
                 isSkilling = true;  // Start skilling
-                print(isSkilling);
+                println(isSkilling);
                 println("Fishing spot found. Interacting.");
                 Execution.delay(random.nextLong(500, 2000));
                 println("Interacted fishing spot: " + fishing.interact("Lure"));
@@ -101,7 +96,7 @@ public class Fishing extends SkeletonScript {
                 Execution.delay(random.nextLong(500, 2000));
                 Bank.depositAllExcept(314);
                 Bank.close();
-                botState = BotState.FISHINGSKILLING;
+                SkeletonScript.botState = SkeletonScript.BotState.FISHINGSKILLING;
             } else {
                 ResultSet<Npc> banks = NpcQuery.newQuery().name("Banker").results();
                 if (banks.isEmpty()) {
@@ -114,7 +109,7 @@ public class Fishing extends SkeletonScript {
                         Execution.delay(random.nextLong(500, 2000));
                         Bank.depositAllExcept(314);
                         Bank.close();
-                        botState = BotState.FISHINGSKILLING;
+                        SkeletonScript.botState = SkeletonScript.BotState.FISHINGSKILLING;
                     }
                 }
             }

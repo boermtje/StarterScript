@@ -106,9 +106,10 @@ public class RuneCrafting {
     public static long moveToIsland() {
         Area bestIsland = getBestAvailableIsland();
         println("Traversing to island: " + bestIsland);
-        if (Movement.traverse(NavPath.resolve(bestIsland)) == TraverseEvent.State.FINISHED) {
+        if (Movement.traverse(NavPath.resolve(bestIsland.getRandomWalkableCoordinate())) == TraverseEvent.State.FINISHED) {
             println("Done");
             Execution.delay(random.nextInt(100,500));
+            SkeletonScript.botState = SkeletonScript.BotState.RUNECRAFTING;
         }
         else {
             println("Failed to traverse to island");
